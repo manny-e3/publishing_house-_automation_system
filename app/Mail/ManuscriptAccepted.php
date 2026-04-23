@@ -12,7 +12,7 @@ use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-class ManuscriptAccepted extends Mailable
+class ManuscriptAccepted extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

@@ -3,17 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
-use App\Events\ProjectStageUpdated;
-use App\Mail\ProjectStatusUpdated;
-use Illuminate\Support\Facades\Mail;
+use App\Services\ProjectService;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
+    protected $projectService;
+
+    public function __construct(ProjectService $projectService)
+    {
+        $this->projectService = $projectService;
+    }
+
     public function index()
     {
         $stages = Project::STAGES;
-        $projects = Project::with('prospect')->latest()->paginate(10);
+        $projects = $this->projectService->getProjects();
 
         return view('admin.projects.index', compact('projects', 'stages'));
     }
@@ -30,11 +35,7 @@ class ProjectController extends Controller
             'stage' => 'required|string|in:' . implode(',', array_keys(Project::STAGES))
         ]);
 
-        $project->update([
-            'current_stage' => $request->stage
-        ]);
-
-        event(new ProjectStageUpdated($project, $request->stage));
+        $this->projectService->updateStage($project, $request->stage);
 
         return response()->json(['success' => true, 'message' => 'Project stage updated successfully and author notified.']);
     }

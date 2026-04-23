@@ -7,6 +7,14 @@ use App\Models\Transaction;
 use App\Models\PaymentGateway;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use App\Models\Project;
+use App\Models\User;
+use App\Mail\AccountCreatedMail;
+use App\Events\PaymentSuccessful;
+use App\Events\ProjectStageUpdated;
 
 class PaymentService
 {
@@ -189,5 +197,78 @@ class PaymentService
         $signature = $request->header('verif-hash');
         // For simplicity, we compare with secret_key or a dedicated webhook_hash
         return $signature === $secretKey; 
+    }
+
+    /**
+     * Complete the payment process: update invoice, activate project, create user.
+     */
+    public function finalizePayment(Invoice $invoice, string $reference)
+    {
+        // 1. Get transaction to identify amount paid
+        $transaction = Transaction::where('transaction_reference', $reference)
+            ->orWhere('external_reference', $reference)
+            ->first();
+
+        $amountPaid = $transaction ? $transaction->amount : 0;
+        $newTotalPaid = $invoice->total_paid + $amountPaid;
+        
+        // 2. Update Invoice status
+        $invoice->update([
+            'status' => 'paid',
+            'total_paid' => $newTotalPaid,
+            'is_installment' => $newTotalPaid < $invoice->amount,
+            'paid_at' => now(),
+            'payment_reference' => $reference,
+        ]);
+
+        $paymentType = 'initial';
+
+        // 3. Activate Project if needed
+        if ($invoice->prospect->status !== 'project_active') {
+            $project = Project::create([
+                'prospect_id' => $invoice->prospect_id,
+                'payment_reference' => $invoice->payment_reference,
+                'status' => 'editing'
+            ]);
+
+            // Notify via event
+            event(new ProjectStageUpdated($project, 'editing'));
+
+            // Update Prospect status
+            $invoice->prospect->update(['status' => 'project_active']);
+            
+            // 4. Create User Account if not exists
+            $this->ensureUserAccountCreated($invoice->prospect);
+        } else {
+            $paymentType = 'balance';
+        }
+
+        // 5. Notify success
+        event(new PaymentSuccessful($invoice, $paymentType));
+
+        return $paymentType;
+    }
+
+    /**
+     * Ensure the author has an account.
+     */
+    private function ensureUserAccountCreated($prospect)
+    {
+        $user = User::where('email', $prospect->email)->first();
+        if (!$user) {
+            $generatedPassword = Str::random(10);
+            $user = User::create([
+                'name' => $prospect->name,
+                'email' => $prospect->email,
+                'password' => Hash::make($generatedPassword),
+            ]);
+            
+            if (method_exists($user, 'assignRole')) {
+                $user->assignRole('prospect');
+            }
+
+            Mail::to($user->email)->send(new AccountCreatedMail($user, $generatedPassword));
+        }
+        return $user;
     }
 }

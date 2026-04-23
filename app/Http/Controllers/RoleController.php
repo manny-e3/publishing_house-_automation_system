@@ -2,15 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     public function index()
     {
-        $roles = Role::withCount('users')->get();
+        $roles = $this->userService->getRoles();
         return view('admin.roles.index', compact('roles'));
     }
 
@@ -20,7 +28,7 @@ class RoleController extends Controller
             'name' => ['required', 'string', 'unique:roles,name'],
         ]);
 
-        Role::create(['name' => $request->name]);
+        $this->userService->createRole($request->name);
 
         return redirect()->route('admin.roles.index')->with('success', 'Role created successfully.');
     }
@@ -39,21 +47,17 @@ class RoleController extends Controller
             'permissions' => ['nullable', 'array'],
         ]);
 
-        $role->update(['name' => $request->name]);
-        
-        $permissions = $request->permissions ?? [];
-        $role->syncPermissions($permissions);
+        $this->userService->updateRole($role, $request->name, $request->permissions ?? []);
 
         return redirect()->route('admin.roles.index')->with('success', 'Role updated successfully.');
     }
     
     public function destroy(Role $role)
     {
-        if (in_array($role->name, ['admin', 'author'])) {
-            return redirect()->back()->with('error', 'Core roles cannot be deleted.');
+        if ($this->userService->deleteRole($role)) {
+            return redirect()->route('admin.roles.index')->with('success', 'Role deleted successfully.');
         }
         
-        $role->delete();
-        return redirect()->route('admin.roles.index')->with('success', 'Role deleted successfully.');
+        return redirect()->back()->with('error', 'Core roles cannot be deleted.');
     }
 }

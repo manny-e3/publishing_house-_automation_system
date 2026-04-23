@@ -3,19 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
-use App\Models\Project;
 use App\Models\Transaction;
 use App\Models\PaymentGateway;
-use App\Events\PaymentSuccessful;
-use App\Events\ProjectStageUpdated;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use App\Mail\AccountCreatedMail;
 
 class PaymentController extends Controller
 {
@@ -86,7 +77,7 @@ class PaymentController extends Controller
         // Ideally, we'd call the gateway API here to verify. 
         // For now, we trust the callback reference for the sake of development flow,
         // but we'll mark it as 'successful' if it reached here.
-        $this->processPaymentSuccess($transaction->invoice, $reference);
+        $this->paymentService->finalizePayment($transaction->invoice, $reference);
         
         $transaction->update([
             'status' => 'successful',
@@ -127,7 +118,7 @@ class PaymentController extends Controller
         }
 
         if ($invoice && $invoice->status !== 'paid') {
-            $this->processPaymentSuccess($invoice, $paymentRef);
+            $this->paymentService->finalizePayment($invoice, $paymentRef);
         }
 
         // Update Transaction record
@@ -146,66 +137,5 @@ class PaymentController extends Controller
         }
 
         return response()->json(['message' => 'Webhook Processed']);
-    }
-
-    private function processPaymentSuccess(Invoice $invoice, $reference)
-    {
-        // Get the transaction to check amount
-        $transaction = Transaction::where('transaction_reference', $reference)
-            ->orWhere('external_reference', $reference)
-            ->first();
-
-        $amountPaid = $transaction ? $transaction->amount : 0;
-        $isInstallment = $amountPaid < $invoice->amount;
-        $newTotalPaid = $invoice->total_paid + $amountPaid;
-        
-        // Mark as paid or partially paid
-        $invoice->update([
-            'status' => 'paid',
-            'total_paid' => $newTotalPaid,
-            'is_installment' => $newTotalPaid < $invoice->amount,
-            'paid_at' => now(),
-            'payment_reference' => $reference,
-        ]);
-
-        $paymentType = 'initial';
-
-        // Activate Project IF it's not already activated (avoid double activation on subsequent installments)
-        if ($invoice->prospect->status !== 'project_active') {
-            $project = Project::create([
-                'prospect_id' => $invoice->prospect_id,
-                'payment_reference' => $invoice->payment_reference,
-                'status' => 'editing'
-            ]);
-
-            // Notify Author and Team via events
-            event(new ProjectStageUpdated($project, 'editing'));
-
-            // Update Prospect
-            $invoice->prospect->update(['status' => 'project_active']);
-            
-            // Check if user account exists
-            $user = User::where('email', $invoice->prospect->email)->first();
-            if (!$user) {
-                $generatedPassword = Str::random(10);
-                $user = User::create([
-                    'name' => $invoice->prospect->name,
-                    'email' => $invoice->prospect->email,
-                    'password' => Hash::make($generatedPassword),
-                ]);
-                
-                // Assign role if spatie roles exist
-                if (method_exists($user, 'assignRole')) {
-                    $user->assignRole('prospect');
-                }
-
-                // Send email
-                Mail::to($user->email)->send(new AccountCreatedMail($user, $generatedPassword));
-            }
-        } else {
-            $paymentType = 'balance';
-        }
-
-        event(new PaymentSuccessful($invoice, $paymentType));
     }
 }

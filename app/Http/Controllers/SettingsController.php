@@ -3,16 +3,22 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\PricingRate;
 use App\Models\ReviewCriterion;
-use App\Models\Setting;
+use App\Services\SettingsService;
 
 class SettingsController extends Controller
 {
+    protected $settingsService;
+
+    public function __construct(SettingsService $settingsService)
+    {
+        $this->settingsService = $settingsService;
+    }
+
     // Pricing Matrix
     public function pricingIndex()
     {
-        $rates = PricingRate::all()->groupBy('category');
+        $rates = $this->settingsService->getPricingRates();
         return view('admin.settings.pricing', compact('rates'));
     }
 
@@ -22,9 +28,7 @@ class SettingsController extends Controller
             'rates.*' => 'required|numeric|min:0'
         ]);
 
-        foreach ($data['rates'] as $id => $value) {
-            PricingRate::where('id', $id)->update(['value' => $value]);
-        }
+        $this->settingsService->updatePricingRates($data['rates']);
 
         return back()->with('success', 'Pricing matrix updated successfully.');
     }
@@ -32,7 +36,7 @@ class SettingsController extends Controller
     // Review Criteria
     public function criteriaIndex()
     {
-        $criteria = ReviewCriterion::orderBy('sort_order')->get();
+        $criteria = $this->settingsService->getReviewCriteria();
         return view('admin.settings.criteria', compact('criteria'));
     }
 
@@ -48,7 +52,7 @@ class SettingsController extends Controller
             $data['is_active'] = 1;
         }
 
-        ReviewCriterion::create($data);
+        $this->settingsService->createReviewCriterion($data);
 
         return back()->with('success', 'Review criterion added successfully.');
     }
@@ -65,24 +69,21 @@ class SettingsController extends Controller
             $data['is_active'] = 0;
         }
 
-        $criterion->update($data);
+        $this->settingsService->updateReviewCriterion($criterion, $data);
 
         return back()->with('success', 'Review criterion updated successfully.');
     }
 
     public function criteriaDelete(ReviewCriterion $criterion)
     {
-        $criterion->delete();
+        $this->settingsService->deleteReviewCriterion($criterion);
         return back()->with('success', 'Review criterion removed.');
     }
 
     // Global Settings
     public function globalIndex()
     {
-        $settings = Setting::whereNotIn('group', ['Branding', 'Mail', 'Email', 'Branding Settings', 'Mail Settings'])
-            ->get()
-            ->groupBy('group');
-            
+        $settings = $this->settingsService->getGlobalSettings();
         return view('admin.settings.global', compact('settings'));
     }
 
@@ -90,9 +91,7 @@ class SettingsController extends Controller
     {
         $data = $request->except('_token');
 
-        foreach ($data as $key => $value) {
-            Setting::where('key', $key)->update(['value' => $value]);
-        }
+        $this->settingsService->updateGlobalSettings($data);
 
         return back()->with('success', 'System settings updated successfully.');
     }
@@ -100,11 +99,11 @@ class SettingsController extends Controller
     // Email Templates
     public function templatesIndex()
     {
-        $templates = EmailTemplate::all();
+        $templates = \App\Models\EmailTemplate::all();
         return view('admin.settings.templates', compact('templates'));
     }
 
-    public function templatesUpdate(Request $request, EmailTemplate $template)
+    public function templatesUpdate(Request $request, \App\Models\EmailTemplate $template)
     {
         $data = $request->validate([
             'subject' => 'required|string|max:255',

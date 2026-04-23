@@ -17,6 +17,17 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
 {
+    protected $invoiceService;
+    protected $paymentService;
+
+    public function __construct(
+        \App\Services\InvoiceService $invoiceService,
+        \App\Services\PaymentService $paymentService
+    ) {
+        $this->invoiceService = $invoiceService;
+        $this->paymentService = $paymentService;
+    }
+
     public function index()
     {
         $invoices = Invoice::with('prospect')->latest()->paginate(10);
@@ -97,52 +108,17 @@ class InvoiceController extends Controller
             'min_deposit_percentage' => 'required|integer|min:0|max:100',
         ]);
 
-        $invoice = Invoice::create([
-            'prospect_id' => $validated['prospect_id'],
-            'invoice_number' => 'INV-' . strtoupper(Str::random(8)),
-            'amount' => $validated['amount'],
-            'allowed_gateways' => $validated['allowed_gateways'],
-            'min_deposit_percentage' => $validated['min_deposit_percentage'],
-            'status' => 'unpaid'
-        ]);
-
-        event(new \App\Events\InvoiceGenerated($invoice));
+        $this->invoiceService->generateInvoice($validated);
 
         return redirect()->route('admin.invoices.index')->with('success', 'Invoice generated successfully and sent to author.');
     }
 
     public function confirmPayment(Request $request, Invoice $invoice)
     {
-        // Mark invoice as paid
-        $invoice->update([
-            'status' => 'paid',
-            'total_paid' => $invoice->amount, // Manual confirmation assumes full payment unless we add an amount input
-            'is_installment' => false,
-            'paid_at' => now(),
-            'payment_reference' => 'MANUAL-' . strtoupper(Str::random(6)),
-        ]);
+        $reference = 'MANUAL-' . strtoupper(Str::random(6));
         
-        $invoice->refresh(); // Ensure it's fresh for events
-
-        // This event will trigger:
-        // 1. User account creation (if guest)
-        // 2. Author credentials email
-        // 3. Finance alert (N-06)
-        // 4. Editorial alert (N-07)
-        event(new PaymentSuccessful($invoice));
-
-        // Activate Project
-        $project = Project::create([
-            'prospect_id' => $invoice->prospect_id,
-            'payment_reference' => $invoice->payment_reference,
-            'status' => 'editing'
-        ]);
-
-        // This event will trigger author and internal team notifications for the 'editing' stage
-        event(new ProjectStageUpdated($project, 'editing'));
-
-        // Update Prospect to signify it is now in active pipeline
-        $invoice->prospect->update(['status' => 'project_active']);
+        // Use the PaymentService logic to ensure consistency across automated and manual payments
+        $this->paymentService->finalizePayment($invoice, $reference);
 
         return redirect()->route('admin.invoices.index')->with('success', 'Payment confirmed! The Project is now active in the Pipeline.');
     }

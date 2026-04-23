@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class OTPMailable extends Mailable
+class OTPMailable extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

@@ -7,7 +7,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Models\EmailTemplate;
 
-class DynamicMailable extends Mailable
+class DynamicMailable extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Mail\Mailables\Attachment;
 
-class PaymentSuccessfulMail extends Mailable
+class PaymentSuccessfulMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

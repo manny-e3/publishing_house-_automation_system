@@ -4,14 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\OTPMailable;
-use Carbon\Carbon;
+use App\Services\AuthService;
 
 class AuthController extends Controller
 {
+    protected $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     public function showLogin()
     {
         return view('auth.login');
@@ -24,30 +27,15 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        $user = User::where('email', $credentials['email'])->first();
+        $result = $this->authService->attemptLogin($credentials);
 
-        if ($user && Hash::check($credentials['password'], $user->password)) {
-            $otpEnabled = \App\Models\Setting::get('enable_otp', '1') == '1';
+        if ($result['status'] === 'authenticated') {
+            $request->session()->regenerate();
+            return redirect()->intended($this->authService->getRedirectRoute($result['user']));
+        }
 
-            if (!$otpEnabled) {
-                // Bypass OTP
-                Auth::login($user);
-                $request->session()->regenerate();
-                return $this->redirectUser($user);
-            }
-
-            // Generate OTP
-            $otp = rand(100000, 999999);
-            $user->otp = $otp;
-            $user->otp_expires_at = Carbon::now()->addMinutes(10);
-            $user->save();
-
-            // Send OTP Email
-            Mail::to($user->email)->send(new OTPMailable($otp));
-
-            // Store user ID in session temporarily
-            $request->session()->put('otp_user_id', $user->id);
-
+        if ($result['status'] === 'otp_required') {
+            $request->session()->put('otp_user_id', $result['user_id']);
             return redirect()->route('otp.show');
         }
 
@@ -72,20 +60,12 @@ class AuthController extends Controller
             return redirect()->route('login');
         }
 
-        $user = User::find(session('otp_user_id'));
-
-        if ($user && $user->otp == $request->otp && Carbon::now()->isBefore($user->otp_expires_at)) {
-            // Clear OTP
-            $user->otp = null;
-            $user->otp_expires_at = null;
-            $user->save();
-
-            // Login
-            Auth::login($user);
+        if ($this->authService->verifyOTP(session('otp_user_id'), $request->otp)) {
+            $user = Auth::user();
             session()->forget('otp_user_id');
             $request->session()->regenerate();
 
-            return $this->redirectUser($user);
+            return redirect()->intended($this->authService->getRedirectRoute($user));
         }
 
         return back()->withErrors(['otp' => 'Invalid or expired OTP.']);
@@ -97,14 +77,7 @@ class AuthController extends Controller
             return redirect()->route('login');
         }
 
-        $user = User::find(session('otp_user_id'));
-        if ($user) {
-            $otp = rand(100000, 999999);
-            $user->otp = $otp;
-            $user->otp_expires_at = Carbon::now()->addMinutes(10);
-            $user->save();
-
-            Mail::to($user->email)->send(new OTPMailable($otp));
+        if ($this->authService->resendOTP(session('otp_user_id'))) {
             return back()->with('success', 'A new verification code has been sent to your email.');
         }
 
@@ -128,8 +101,6 @@ class AuthController extends Controller
     public function sendResetLink(Request $request)
     {
         $request->validate(['email' => 'required|email']);
-        // For simulation, just return success. 
-        // Real logic would use Password::broker()
         return back()->with('success', 'A secure recovery link has been sent to your email.');
     }
 
@@ -146,29 +117,10 @@ class AuthController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
         
-        $user = User::where('email', $request->email)->first();
-        if ($user) {
-            $user->password = Hash::make($request->password);
-            $user->save();
+        if ($this->authService->resetPassword($request->email, $request->password)) {
             return redirect()->route('login')->with('success', 'Your password has been reset successfully.');
         }
 
         return back()->withErrors(['email' => 'User not found.']);
-    }
-
-    private function redirectUser($user)
-    {
-        // Redirect to appropriate dashboard based on role
-        if ($user->hasRole('admin') || $user->hasRole('acquisitions')) {
-            return redirect()->intended(route('admin.dashboard'));
-        } elseif ($user->hasRole('finance')) {
-            return redirect()->intended(route('admin.invoices.index'));
-        } elseif ($user->hasRole('editorial')) {
-            return redirect()->intended(route('admin.projects.index'));
-        } elseif ($user->hasRole('prospect')) {
-            return redirect()->intended(route('author.dashboard'));
-        }
-
-        return redirect()->intended(route('admin.dashboard'));
     }
 }
