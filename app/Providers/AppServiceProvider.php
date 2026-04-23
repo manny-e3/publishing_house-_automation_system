@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
 
 use Illuminate\Support\Facades\Event;
 use App\Events\ProspectSubmitted;
@@ -28,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::useBootstrapFive();
+        
         Event::listen(ProspectSubmitted::class, [SendAuthorNotifications::class, 'handle']);
         Event::listen(InvoiceGenerated::class, [SendAuthorNotifications::class, 'handle']);
         Event::listen(ManuscriptAccepted::class, [SendAuthorNotifications::class, 'handle']);

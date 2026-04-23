@@ -26,4 +26,14 @@ class Prospect extends Model
     {
         return $this->hasMany(ProspectEvaluation::class);
     }
+
+    public function project()
+    {
+        return $this->hasOne(Project::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
 }

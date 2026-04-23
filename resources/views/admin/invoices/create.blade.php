@@ -77,6 +77,23 @@
                                     <div class="form-note mt-1">Select at least one payment method to offer the author.</div>
                                 </div>
 
+                                <div class="form-group mt-4 pt-4 border-top">
+                                    <div class="row g-3 items-center">
+                                        <div class="col-md-6">
+                                            <label class="form-label mb-0">Minimum Deposit Percentage (%)</label>
+                                            <p class="text-soft small mb-0">The lowest amount (in %) the author can pay to activate their project.</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-control-wrap">
+                                                <div class="form-text-hint">
+                                                    <span class="overline-title">%</span>
+                                                </div>
+                                                <input type="number" name="min_deposit_percentage" class="form-control form-control-lg" value="{{ $minDeposit }}" min="0" max="100" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="form-group mt-4 pt-2 border-top">
                                     <button type="submit" class="btn btn-lg btn-primary fw-bold w-100"><em class="icon ni ni-file-docs"></em><span>Lock & Generate Invoice</span></button>
                                 </div>

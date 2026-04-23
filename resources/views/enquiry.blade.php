@@ -38,7 +38,7 @@
 
     <!-- Header -->
     <header class="bg-brand-bg border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <div class="flex-shrink-0 flex items-center">
                     <a href="#" class="font-serif italic font-bold text-2xl text-gray-900 tracking-tight">The Curated
@@ -61,7 +61,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main class="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="mb-10">
             <h1 class="text-4xl md:text-5xl font-serif text-gray-900 mb-4">Publishing Enquiry</h1>
             <p class="text-gray-600 max-w-3xl leading-relaxed">Begin the journey of bringing your manuscript to the
@@ -122,50 +122,42 @@
                             </div>
                             <div class="space-y-5">
                                 <div>
-                                    <label class="block text-sm text-gray-700 font-medium mb-1">Full Name <span
-                                            class="text-red-500">*</span></label>
-                                    <input type="text" name="name" required value="{{ old('name') }}"
-                                        placeholder="Your answer"
+                                    <label class="block text-sm text-gray-700 font-medium mb-1">Full Name <span class="text-red-500">*</span></label>
+                                    <input type="text" name="name" required value="{{ old('name') }}" placeholder="Enter your full name"
                                         class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <div>
-                                        <label class="block text-sm text-gray-700 font-medium mb-1">Phone number <span
-                                                class="text-red-500">*</span></label>
-                                        <input type="tel" name="phone_number" required value="{{ old('phone_number') }}"
-                                            placeholder="Your answer"
+                                        <label class="block text-sm text-gray-700 font-medium mb-1">Phone number <span class="text-red-500">*</span></label>
+                                        <input type="tel" name="phone_number" required value="{{ old('phone_number') }}" placeholder="Enter your phone number"
                                             class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm text-gray-700 font-medium mb-1">Email <span
-                                                class="text-red-500">*</span></label>
-                                        <input type="email" name="email" required value="{{ old('email') }}"
-                                            placeholder="Your answer"
+                                        <label class="block text-sm text-gray-700 font-medium mb-1">Email <span class="text-red-500">*</span></label>
+                                        <input type="email" name="email" required value="{{ old('email') }}" placeholder="Enter your email address"
                                             class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
                                     </div>
                                 </div>
                             </div>
                         </section>
 
-                        <section class="bg-white p-6 md:p-8 shadow-sm border border-gray-100">
-                            <div class="flex items-center space-x-3 mb-6">
-                                <h2 class="text-xl font-serif text-gray-900 uppercase tracking-wide">About The Book</h2>
-                            </div>
+                         <section class="bg-white p-6 md:p-8 shadow-sm border border-gray-100 border-l-4 border-l-brand-accent">
+                             <div class="flex items-center space-x-3 mb-6">
+                                 <span class="w-8 h-8 bg-brand-accent/10 text-brand-accent rounded-full flex items-center justify-center font-bold text-sm">1</span>
+                                 <h2 class="text-xl font-serif text-gray-900 uppercase tracking-wide">About The Book</h2>
+                             </div>
                             <div class="space-y-6">
                                 <div>
-                                    <label class="block text-sm text-gray-700 font-medium mb-1">Book Title <span
-                                            class="text-red-500">*</span></label>
-                                    <input type="text" name="book_title" required value="{{ old('book_title') }}"
-                                        placeholder="Your answer"
+                                    <label class="block text-sm text-gray-700 font-medium mb-1">Book Title <span class="text-red-500">*</span></label>
+                                    <input type="text" name="book_title" required value="{{ old('book_title') }}" placeholder="Enter your book title"
                                         class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
                                 </div>
 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label class="block text-sm text-gray-700 font-medium mb-1">Genre <span
-                                                class="text-red-500">*</span></label>
+                                        <label class="block text-sm text-gray-700 font-medium mb-1">Genre <span class="text-red-500">*</span></label>
                                         <select name="genre" required
                                             class="w-full bg-gray-50 border border-gray-300 focus:bg-white focus:border-brand-dark focus:ring-0 rounded-sm py-2 px-4 text-gray-700 transition-colors">
                                             <option value="">Choose</option>
@@ -178,11 +170,8 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm text-gray-700 font-medium mb-1">Number of Words
-                                            <span class="text-red-500">*</span></label>
-                                        <input type="number" x-model.number="words" name="number_of_words" required
-                                            min="1" value="{{ old('number_of_words') }}"
-                                            placeholder="Estimated word count"
+                                        <label class="block text-sm text-gray-700 font-medium mb-1">Number of Words <span class="text-red-500">*</span></label>
+                                        <input type="number" x-model.number="words" name="number_of_words" required min="1" value="{{ old('number_of_words') }}" placeholder="Enter estimated word count"
                                             class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
                                     </div>
                                 </div>
@@ -246,6 +235,77 @@
                                         <p class="mt-2 text-xs text-red-500">Please select at least one service.</p>
                                     </template>
                                 </div>
+
+                                <!-- BOOK PRODUCTION OPTIONS (Conditional on Printing) -->
+                                <div x-show="services.includes('printing')" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" class="pt-8 border-t border-gray-100 space-y-6">
+                                    <div class="flex items-center space-x-3 mb-6">
+                                        <span class="w-8 h-8 bg-brand-accent/10 text-brand-accent rounded-full flex items-center justify-center font-bold text-sm">2</span>
+                                        <h2 class="text-xl font-serif text-gray-900 uppercase tracking-wide">Production Details</h2>
+                                    </div>
+
+                                    <input type="hidden" name="estimated_cost" :value="estimatedTotal">
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-sm text-gray-700 font-medium mb-1">Print Quantity <span class="text-red-500">*</span></label>
+                                            <input type="number" x-model.number="print_quantity" name="print_quantity" :required="services.includes('printing')" min="1" placeholder="e.g. 500 copies"
+                                                class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
+                                            <p class="text-[10px] text-gray-500 mt-1">Number of physical copies you wish to produce.</p>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm text-gray-700 font-medium mb-1">Estimated Page Count <span class="text-red-500">*</span></label>
+                                            <input type="number" x-model.number="estimated_pages" name="estimated_pages" :required="services.includes('printing')" min="1" placeholder="e.g. 200 pages"
+                                                class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
+                                            <p class="text-[10px] text-gray-500 mt-1">Rough number of pages in your final book.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-sm text-gray-700 font-medium mb-1">Interior Paper <span class="text-red-500">*</span></label>
+                                            <select name="interior_paper" x-model="interior_paper" :required="services.includes('printing')"
+                                                class="w-full bg-gray-50 border border-gray-300 focus:bg-white focus:border-brand-dark focus:ring-0 rounded-sm py-2 px-4 text-gray-700 transition-colors">
+                                                <option value="">Select Paper Type</option>
+                                                @foreach($groupedRates['interior_paper'] ?? [] as $rate)
+                                                    <option value="{{ $rate->key }}">{{ $rate->label }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm text-gray-700 font-medium mb-1">Cover Paper <span class="text-red-500">*</span></label>
+                                            <select name="cover_paper" x-model="cover_paper" :required="services.includes('printing')"
+                                                class="w-full bg-gray-50 border border-gray-300 focus:bg-white focus:border-brand-dark focus:ring-0 rounded-sm py-2 px-4 text-gray-700 transition-colors">
+                                                <option value="">Select Cover Material</option>
+                                                @foreach($groupedRates['special_paper'] ?? [] as $rate)
+                                                    <option value="{{ $rate->key }}">{{ $rate->label }}</option>
+                                                @endforeach
+                                                @foreach($groupedRates['cover_paper'] ?? [] as $rate)
+                                                    <option value="{{ $rate->key }}">{{ $rate->label }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-4">
+                                        <label class="block text-sm text-gray-700 font-medium mb-2">Enhancements</label>
+                                        <div class="flex flex-wrap gap-4">
+                                            <label class="flex items-center space-x-2 cursor-pointer group">
+                                                <input type="checkbox" name="is_hard_cover" x-model="is_hard_cover" class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
+                                                <span class="text-xs text-gray-600 group-hover:text-gray-900 transition-colors">Hard Cover</span>
+                                            </label>
+                                            <label class="flex items-center space-x-2 cursor-pointer group">
+                                                <input type="checkbox" name="is_embossed" x-model="is_embossed" class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
+                                                <span class="text-xs text-gray-600 group-hover:text-gray-900 transition-colors">Embossing</span>
+                                            </label>
+                                            <label class="flex items-center space-x-2 cursor-pointer group">
+                                                <input type="checkbox" name="is_packaged" x-model="is_packaged" class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
+                                                <span class="text-xs text-gray-600 group-hover:text-gray-900 transition-colors">Premium Packaging</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </section>
                     </div>
@@ -280,31 +340,24 @@
                             </div>
                         </section>
 
-                        <section class="bg-white shadow-sm overflow-hidden border border-gray-200">
-                            <div class="bg-gray-50 px-6 py-4 md:px-8 border-b border-gray-200">
-                                <h2 class="text-lg font-serif text-gray-900 uppercase tracking-wide">Submission
-                                    Agreement</h2>
+                        <section class="bg-white shadow-sm overflow-hidden border border-gray-200 border-l-4 border-l-brand-accent">
+                            <div class="flex items-center space-x-3 bg-gray-50 px-6 py-4 md:px-8 border-b border-gray-200">
+                                <span class="w-8 h-8 bg-brand-accent/10 text-brand-accent rounded-full flex items-center justify-center font-bold text-sm">3</span>
+                                <h2 class="text-xl font-serif text-gray-900 uppercase tracking-wide">Submission Agreement</h2>
                             </div>
                             <div class="p-6 md:p-8 space-y-6">
-                                <div
-                                    class="text-sm text-gray-600 space-y-3 mb-6 bg-gray-100 p-4 border border-gray-200">
-                                    <p><strong>1. Confidentiality:</strong> We acknowledge that the manuscript submitted
-                                        is confidential. We will not reproduce or distribute the manuscript without
-                                        consent.</p>
-                                    <p><strong>2. Evaluation Purpose:</strong> The manuscript is submitted solely for
-                                        the purpose of evaluation.</p>
+                                <div class="text-sm text-gray-600 space-y-3 mb-6 bg-gray-100 p-4 border border-gray-200">
+                                    <p><strong>1. Confidentiality:</strong> We acknowledge that the manuscript submitted is confidential. We will not reproduce or distribute the manuscript without consent.</p>
+                                    <p><strong>2. Evaluation Purpose:</strong> The manuscript is submitted solely for the purpose of evaluation.</p>
                                 </div>
                                 <div>
                                     <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" name="agreement_terms" required
-                                            class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
-                                        <span class="text-sm text-gray-700">I Agree to the Terms and Conditions. <span
-                                                class="text-red-500">*</span></span>
+                                        <input type="checkbox" name="agreement_terms" required class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
+                                        <span class="text-sm text-gray-700">I Agree to the Terms and Conditions. <span class="text-red-500">*</span></span>
                                     </label>
                                 </div>
                                 <div>
-                                    <label class="block text-sm text-gray-700 font-medium mb-1">Electronic Signature
-                                        (Full Name) <span class="text-red-500">*</span></label>
+                                    <label class="block text-sm text-gray-700 font-medium mb-1">Electronic Signature (Full Name) <span class="text-red-500">*</span></label>
                                     <input type="text" name="agreement_name" required placeholder="Your full legal name"
                                         class="w-full md:w-1/2 bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
                                 </div>
@@ -449,17 +502,28 @@
     </footer>
     <script>
         document.addEventListener('alpine:init', () => {
-            Alpine.data('enquiryForm', () => ({
+             Alpine.data('enquiryForm', () => ({
                 step: 1, 
                 maxStep: 2,
                 words: {{ (int)old('number_of_words', 0) }},
                 services: @json(old('services', ['editing'])),
                 allRates: @json($rates),
+                
+                // Production Details
+                print_quantity: 600,
+                estimated_pages: 120, // Default assumption
+                interior_paper: '',
+                cover_paper: '',
+                is_hard_cover: false,
+                is_embossed: false,
+                is_packaged: false,
+
                 get estimatedTotal() {
                     let r = this.allRates || {};
                     let setup = parseFloat(r.fixed_setup_fee);
                     let total = isNaN(setup) ? 150000 : setup;
                     
+                    // Editorial costs
                     if (this.services && this.services.includes('editing')) {
                         let fixed = parseFloat(r.fixed_editing_fee) || 0;
                         let perWord = parseFloat(r.editing_per_word) || 5;
@@ -476,8 +540,38 @@
                         total += parseFloat(r.fixed_cover_design_fee) || 50000;
                     }
                     
+                    // Advanced Printing costs
                     if (this.services && this.services.includes('printing')) {
-                        total += parseFloat(r.fixed_printing_fee) || 100000;
+                        // 1. Interior Paper
+                        if (this.interior_paper && r[this.interior_paper]) {
+                            // Rough calculation for rims: (qty * pages) / (pages per sheet * 500)
+                            let rims = Math.ceil((this.print_quantity * this.estimated_pages) / (32 * 500));
+                            total += rims * parseFloat(r[this.interior_paper]);
+                        } else {
+                            total += parseFloat(r.fixed_printing_fee) || 100000;
+                        }
+
+                        // 2. Cover Paper
+                        if (this.cover_paper && r[this.cover_paper]) {
+                            total += parseFloat(r[this.cover_paper]);
+                        }
+
+                        // 3. Finishing Operations (per book)
+                        let finishing = (parseFloat(r.calc_folding) || 50) + 
+                                        (parseFloat(r.calc_lamination) || 70) + 
+                                        (parseFloat(r.calc_binding) || 50) + 
+                                        (parseFloat(r.calc_cutting) || 20);
+                        
+                        total += (finishing * this.print_quantity);
+
+                        // 4. Special Effects
+                        if (this.is_hard_cover) total += (parseFloat(r.calc_hard_cover) || 3000) * this.print_quantity;
+                        if (this.is_embossed) total += (parseFloat(r.calc_embossing) || 500) * this.print_quantity;
+                        if (this.is_packaged) total += (parseFloat(r.calc_packaging) || 50) * this.print_quantity;
+                        
+                        // 5. Plating & Impression (Base setup for printing)
+                        total += (parseFloat(r.calc_interior_plating) || 4500) * Math.ceil(this.estimated_pages / 16);
+                        total += (parseFloat(r.calc_cover_plating) || 14000);
                     }
                     
                     return total;

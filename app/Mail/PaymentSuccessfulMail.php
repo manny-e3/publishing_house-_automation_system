@@ -8,6 +8,8 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Mail\Mailables\Attachment;
 
 class PaymentSuccessfulMail extends Mailable
 {
@@ -34,5 +36,15 @@ class PaymentSuccessfulMail extends Mailable
         return new Content(
             view: 'emails.payment_success',
         );
+    }
+
+    public function attachments(): array
+    {
+        $pdf = Pdf::loadView('admin.receipts.pdf', ['invoice' => $this->invoice]);
+        
+        return [
+            Attachment::fromData(fn () => $pdf->output(), 'RECEIPT-' . $this->invoice->payment_reference . '.pdf')
+                    ->withMime('application/pdf'),
+        ];
     }
 }

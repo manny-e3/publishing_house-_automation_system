@@ -47,11 +47,18 @@
                                             </td>
                                             <td class="tb-odr-amount">
                                                 <span class="tb-odr-total">
-                                                    <span class="amount">₦{{ number_format($invoice->amount, 2) }}</span>
+                                                    <span class="amount">₦{{ number_format($invoice->is_installment ? $invoice->total_paid : $invoice->amount, 2) }}</span>
+                                                    @if($invoice->is_installment)
+                                                        <div class="smaller text-soft">of ₦{{ number_format($invoice->amount, 2) }}</div>
+                                                    @endif
                                                 </span>
                                             </td>
                                             <td class="tb-odr-status">
-                                                <span class="badge badge-dot bg-success">Paid</span>
+                                                @if($invoice->is_installment)
+                                                    <span class="badge badge-dot bg-info">Installment</span>
+                                                @else
+                                                    <span class="badge badge-dot bg-success">Full Payment</span>
+                                                @endif
                                                 <div class="small text-soft">{{ $invoice->prospect->name }}</div>
                                             </td>
                                             <td class="tb-odr-action">
@@ -79,7 +86,7 @@
                             </div>
                             @if($invoices->hasPages())
                             <div class="card-inner">
-                                {{ $invoices->links('vendor.pagination.bootstrap-5') }}
+                                {{ $invoices->links() }}
                             </div>
                             @endif
                         </div>

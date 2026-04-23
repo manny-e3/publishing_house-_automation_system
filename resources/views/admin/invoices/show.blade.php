@@ -58,6 +58,7 @@
                                         <li class="invoice-date"><span>Date</span>:<span>{{ $invoice->created_at->format('d F Y') }}</span></li>
                                         @if($invoice->status == 'paid')
                                         <li class="invoice-date"><span>Paid On</span>:<span>{{ $invoice->paid_at ? $invoice->paid_at->format('d F Y') : 'N/A' }}</span></li>
+                                        <li class="invoice-date"><span>Status</span>:<span>{!! $invoice->is_installment ? '<span class="text-info fw-bold">INSTALLMENT</span>' : '<span class="text-success fw-bold">FULL PAYMENT</span>' !!}</span></li>
                                         @endif
                                     </ul>
                                 </div>
@@ -101,6 +102,18 @@
                                                 <td>Subtotal</td>
                                                 <td>₦{{ number_format($invoice->amount, 2) }}</td>
                                             </tr>
+                                            @if($invoice->is_installment)
+                                            <tr>
+                                                <td colspan="2"></td>
+                                                <td class="text-info">Total Paid (Installments)</td>
+                                                <td class="text-info">₦{{ number_format($invoice->total_paid, 2) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"></td>
+                                                <td class="text-danger">Balance Due</td>
+                                                <td class="text-danger fw-bold">₦{{ number_format($invoice->amount - $invoice->total_paid, 2) }}</td>
+                                            </tr>
+                                            @endif
                                             <tr>
                                                 <td colspan="2"></td>
                                                 <td>Grand Total</td>

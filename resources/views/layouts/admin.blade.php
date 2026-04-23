@@ -7,6 +7,7 @@
     <title>@yield('title', 'Admin Dashboard') | The Curated Archive</title>
     <link rel="stylesheet" href="{{ asset('assets/css/dashlite.css') }}">
     <link id="skin-default" rel="stylesheet" href="{{ asset('assets/css/theme.css') }}">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="nk-body bg-lighter npc-general has-sidebar">
@@ -77,22 +78,42 @@
                                 </li>
                                 @endrole
 
+                                @hasrole('admin')
+                                <li class="nk-menu-heading">
+                                    <h6 class="overline-title text-soft">Access Control</h6>
+                                </li>
+                                <li class="nk-menu-item has-sub">
+                                    <a href="#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-users"></em></span>
+                                        <span class="nk-menu-text">User Management</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="{{ route('admin.users.index') }}" class="nk-menu-link"><span class="nk-menu-text">User List</span></a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="{{ route('admin.roles.index') }}" class="nk-menu-link"><span class="nk-menu-text">Roles & Permissions</span></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                @endrole
+
                                 @hasanyrole('admin|finance')
                                 <li class="nk-menu-heading">
                                     <h6 class="overline-title text-soft">Configuration</h6>
                                 </li>
                                 <li class="nk-menu-item">
-                                    <a href="{{ route('admin.settings.gateways') }}" class="nk-menu-link">
-                                        <span class="nk-menu-icon"><em class="icon ni ni-setting-alt"></em></span>
-                                        <span class="nk-menu-text">Payment Settings</span>
-                                    </a>
+                                    
                                 </li>
                                 <li class="nk-menu-item has-sub">
                                     <a href="#" class="nk-menu-link nk-menu-toggle">
-                                        <span class="nk-menu-icon"><em class="icon ni ni-config"></em></span>
+                                        <span class="nk-menu-icon"><em class="icon ni ni-config"></em> <em class="icon ni ni-setting-alt"></em></span>
                                         <span class="nk-menu-text">System Settings</span>
                                     </a>
                                     <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="{{ route('admin.settings.gateways') }}" class="nk-menu-link"><span class="nk-menu-text">Payment Settings</span></a>
+                                        </li>
                                         <li class="nk-menu-item">
                                             <a href="{{ route('admin.settings.pricing') }}" class="nk-menu-link"><span class="nk-menu-text">Pricing Matrix</span></a>
                                         </li>

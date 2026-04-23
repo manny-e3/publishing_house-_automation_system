@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\Transaction;
+use App\Models\PaymentGateway;
 use App\Events\PaymentSuccessful;
-use App\Mail\ProjectStatusUpdated;
+use App\Events\ProjectStageUpdated;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use App\Mail\AccountCreatedMail;
 
 class PaymentController extends Controller
 {
@@ -21,13 +26,26 @@ class PaymentController extends Controller
         $this->paymentService = $paymentService;
     }
 
+    public function showCheckout(Invoice $invoice)
+    {
+        $gateways = PaymentGateway::where('is_active', true)->get();
+        return view('payments.checkout', compact('invoice', 'gateways'));
+    }
+
     /**
      * Initiate payment redirect
      */
-    public function initiate(Invoice $invoice, string $gateway)
+    public function initiate(Invoice $invoice, Request $request)
     {
         try {
-            $redirectUrl = $this->paymentService->initializePayment($invoice, $gateway);
+            $gateway = $request->query('gateway') ?? $request->input('gateway');
+            $amount = $request->query('amount') ?? $request->input('amount');
+            
+            if (!$gateway) {
+                throw new \Exception("Please select a payment gateway.");
+            }
+
+            $redirectUrl = $this->paymentService->initializePayment($invoice, $gateway, $amount);
             return redirect()->away($redirectUrl);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -56,7 +74,13 @@ class PaymentController extends Controller
 
         // If already success, just redirect
         if ($transaction->status == 'successful') {
-            return redirect()->route('admin.invoices.show', $transaction->invoice_id)->with('success', 'Payment successful!');
+            if (auth()->check()) {
+                if (auth()->user()->hasRole('admin')) {
+                    return redirect()->route('admin.invoices.show', $transaction->invoice_id)->with('success', 'Payment successful!');
+                }
+                return redirect()->route('author.dashboard')->with('success', 'Payment successful!');
+            }
+            return redirect()->route('payments.success')->with('success', 'Payment successful!');
         }
 
         // Ideally, we'd call the gateway API here to verify. 
@@ -69,7 +93,14 @@ class PaymentController extends Controller
             'external_reference' => $reference
         ]);
 
-        return redirect()->route('admin.invoices.show', $transaction->invoice_id)->with('success', 'Payment confirmed and project activated!');
+        if (auth()->check()) {
+            if (auth()->user()->hasRole('admin')) {
+                return redirect()->route('admin.invoices.show', $transaction->invoice_id)->with('success', 'Payment confirmed and project activated!');
+            }
+            return redirect()->route('author.dashboard')->with('success', 'Payment confirmed and project activated!');
+        }
+
+        return redirect()->route('payments.success')->with('success', 'Payment confirmed and project activated!');
     }
 
     /**
@@ -119,30 +150,62 @@ class PaymentController extends Controller
 
     private function processPaymentSuccess(Invoice $invoice, $reference)
     {
-        // Mark as paid
+        // Get the transaction to check amount
+        $transaction = Transaction::where('transaction_reference', $reference)
+            ->orWhere('external_reference', $reference)
+            ->first();
+
+        $amountPaid = $transaction ? $transaction->amount : 0;
+        $isInstallment = $amountPaid < $invoice->amount;
+        $newTotalPaid = $invoice->total_paid + $amountPaid;
+        
+        // Mark as paid or partially paid
         $invoice->update([
             'status' => 'paid',
+            'total_paid' => $newTotalPaid,
+            'is_installment' => $newTotalPaid < $invoice->amount,
             'paid_at' => now(),
             'payment_reference' => $reference,
         ]);
 
-        // Activate Project
-        $project = Project::create([
-            'prospect_id' => $invoice->prospect_id,
-            'payment_reference' => $invoice->payment_reference,
-            'status' => 'editing'
-        ]);
+        $paymentType = 'initial';
 
-        // Notify Author
-        try {
-            Mail::to($invoice->prospect->email)->send(new ProjectStatusUpdated($project, 'editing'));
-        } catch (\Exception $e) {
-            Log::error('Webhook Activation Email Failed: ' . $e->getMessage());
+        // Activate Project IF it's not already activated (avoid double activation on subsequent installments)
+        if ($invoice->prospect->status !== 'project_active') {
+            $project = Project::create([
+                'prospect_id' => $invoice->prospect_id,
+                'payment_reference' => $invoice->payment_reference,
+                'status' => 'editing'
+            ]);
+
+            // Notify Author and Team via events
+            event(new ProjectStageUpdated($project, 'editing'));
+
+            // Update Prospect
+            $invoice->prospect->update(['status' => 'project_active']);
+            
+            // Check if user account exists
+            $user = User::where('email', $invoice->prospect->email)->first();
+            if (!$user) {
+                $generatedPassword = Str::random(10);
+                $user = User::create([
+                    'name' => $invoice->prospect->name,
+                    'email' => $invoice->prospect->email,
+                    'password' => Hash::make($generatedPassword),
+                ]);
+                
+                // Assign role if spatie roles exist
+                if (method_exists($user, 'assignRole')) {
+                    $user->assignRole('prospect');
+                }
+
+                // Send email
+                Mail::to($user->email)->send(new AccountCreatedMail($user, $generatedPassword));
+            }
+        } else {
+            $paymentType = 'balance';
         }
 
-        // Update Prospect
-        $invoice->prospect->update(['status' => 'project_active']);
-
-        event(new PaymentSuccessful($invoice));
+        event(new PaymentSuccessful($invoice, $paymentType));
     }
 }

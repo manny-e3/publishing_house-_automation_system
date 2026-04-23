@@ -27,6 +27,15 @@ class AuthController extends Controller
         $user = User::where('email', $credentials['email'])->first();
 
         if ($user && Hash::check($credentials['password'], $user->password)) {
+            $otpEnabled = \App\Models\Setting::get('enable_otp', '1') == '1';
+
+            if (!$otpEnabled) {
+                // Bypass OTP
+                Auth::login($user);
+                $request->session()->regenerate();
+                return $this->redirectUser($user);
+            }
+
             // Generate OTP
             $otp = rand(100000, 999999);
             $user->otp = $otp;
@@ -76,7 +85,7 @@ class AuthController extends Controller
             session()->forget('otp_user_id');
             $request->session()->regenerate();
 
-            return redirect()->intended(route('admin.dashboard'));
+            return $this->redirectUser($user);
         }
 
         return back()->withErrors(['otp' => 'Invalid or expired OTP.']);
@@ -145,5 +154,21 @@ class AuthController extends Controller
         }
 
         return back()->withErrors(['email' => 'User not found.']);
+    }
+
+    private function redirectUser($user)
+    {
+        // Redirect to appropriate dashboard based on role
+        if ($user->hasRole('admin') || $user->hasRole('acquisitions')) {
+            return redirect()->intended(route('admin.dashboard'));
+        } elseif ($user->hasRole('finance')) {
+            return redirect()->intended(route('admin.invoices.index'));
+        } elseif ($user->hasRole('editorial')) {
+            return redirect()->intended(route('admin.projects.index'));
+        } elseif ($user->hasRole('prospect')) {
+            return redirect()->intended(route('author.dashboard'));
+        }
+
+        return redirect()->intended(route('admin.dashboard'));
     }
 }

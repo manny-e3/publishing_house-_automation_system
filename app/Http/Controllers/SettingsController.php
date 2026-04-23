@@ -44,9 +44,30 @@ class SettingsController extends Controller
             'is_active' => 'boolean'
         ]);
 
+        if (!$request->has('is_active')) {
+            $data['is_active'] = 1;
+        }
+
         ReviewCriterion::create($data);
 
         return back()->with('success', 'Review criterion added successfully.');
+    }
+
+    public function criteriaUpdate(Request $request, ReviewCriterion $criterion)
+    {
+        $data = $request->validate([
+            'label' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'is_active' => 'boolean'
+        ]);
+
+        if (!$request->has('is_active')) {
+            $data['is_active'] = 0;
+        }
+
+        $criterion->update($data);
+
+        return back()->with('success', 'Review criterion updated successfully.');
     }
 
     public function criteriaDelete(ReviewCriterion $criterion)
@@ -58,7 +79,10 @@ class SettingsController extends Controller
     // Global Settings
     public function globalIndex()
     {
-        $settings = Setting::all()->groupBy('group');
+        $settings = Setting::whereNotIn('group', ['Branding', 'Mail', 'Email', 'Branding Settings', 'Mail Settings'])
+            ->get()
+            ->groupBy('group');
+            
         return view('admin.settings.global', compact('settings'));
     }
 

@@ -36,6 +36,24 @@ class Project extends Model
         return self::STAGES[$this->current_stage] ?? 'Unknown Stage';
     }
 
+    public function getProgressPercentageAttribute()
+    {
+        $stageProgress = [
+            'project_recording' => 10,
+            'manuscript_review' => 20,
+            'book_cover_isbn' => 30,
+            'editing' => 40,
+            'formatting' => 50,
+            'dummy_review' => 60,
+            'printing' => 75,
+            'distribution' => 85,
+            'sales_promotion' => 95,
+            'reviews' => 100
+        ];
+
+        return $stageProgress[$this->current_stage] ?? 0;
+    }
+
 
     protected $casts = [
         'estimated_completion_date' => 'date',

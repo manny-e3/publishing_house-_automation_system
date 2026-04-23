@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             PaymentGatewaySeeder::class,
             EmailTemplateSeeder::class,
             SystemSettingsSeeder::class,
+            PricingRatesUpdateSeeder::class,
         ]);
     }
 }

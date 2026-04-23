@@ -130,7 +130,7 @@
                             </div>
                             @if($projects->hasPages())
                             <div class="card-inner">
-                                {{ $projects->links('vendor.pagination.bootstrap-5') }}
+                                {{ $projects->links() }}
                             </div>
                             @endif
                         </div>

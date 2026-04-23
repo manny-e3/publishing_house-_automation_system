@@ -102,6 +102,11 @@
                                     </tbody>
                                 </table>
                             </div>
+                            @if($prospects->hasPages())
+                            <div class="card-inner">
+                                {{ $prospects->links() }}
+                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>

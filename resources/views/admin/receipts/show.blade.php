@@ -29,7 +29,12 @@
                         <div class="card-inner">
                             <div class="nk-receipt">
                                 <div class="nk-receipt-head mb-5 text-center">
-                                    <h4 class="title text-success">Payment Received</h4>
+                                    @php 
+                                        $isPartial = $invoice->total_paid > 0 && $invoice->total_paid < $invoice->amount;
+                                    @endphp
+                                    <h4 class="title {{ $isPartial ? 'text-info' : 'text-success' }}">
+                                        {{ $isPartial ? 'Installment Received' : 'Payment Received' }}
+                                    </h4>
                                     <p class="text-soft">Thank you for your payment. Your project has been activated.</p>
                                 </div>
                                 <div class="row g-gs">
@@ -72,9 +77,24 @@
                                                 <td>
                                                     <span class="fw-bold">Publishing Service Fee</span><br>
                                                     <span class="text-soft small">Book Title: {{ $invoice->prospect->book_title }}</span>
+                                                    @if($invoice->is_installment)
+                                                        <div class="badge badge-dim bg-info mt-2">Installment Payment</div>
+                                                    @endif
                                                 </td>
-                                                <td class="text-end fw-bold text-dark">₦{{ number_format($invoice->amount, 2) }}</td>
+                                                <td class="text-end fw-bold text-dark">
+                                                    ₦{{ number_format($invoice->is_installment ? $invoice->total_paid : $invoice->amount, 2) }}
+                                                </td>
                                             </tr>
+                                            @if($invoice->is_installment)
+                                            <tr class="bg-lighter">
+                                                <td class="text-end text-soft small">Total Invoice Amount</td>
+                                                <td class="text-end text-soft small">₦{{ number_format($invoice->amount, 2) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-end fw-bold">Balance Outstanding</td>
+                                                <td class="text-end fw-bold text-danger">₦{{ number_format($invoice->amount - $invoice->total_paid, 2) }}</td>
+                                            </tr>
+                                            @endif
                                         </tbody>
                                     </table>
                                 </div>

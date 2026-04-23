@@ -55,8 +55,8 @@
                                             </td>
                                             <td class="tb-tnx-info">
                                                 <div class="tb-tnx-desc">
-                                                    <span class="title">Invoice #{{ $tx->invoice->invoice_number }}</span>
-                                                    <span class="text-soft small">{{ $tx->invoice->prospect->name ?? 'Author' }}</span>
+                                                    <span class="title">Invoice #{{ $tx->invoice->invoice_number ?? 'N/A' }}</span>
+                                                    <span class="text-soft small">{{ $tx->invoice->prospect->name ?? 'Author N/A' }}</span>
                                                 </div>
                                                 <div class="tb-tnx-date">
                                                     <span class="date">{{ $tx->created_at->format('d/m/Y') }}</span>
@@ -82,7 +82,9 @@
                                                     <a class="text-soft dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
                                                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
                                                         <ul class="link-list-plain">
-                                                            <li><a href="{{ route('admin.invoices.show', $tx->invoice_id) }}">View Invoice</a></li>
+                                                            @if($tx->invoice_id)
+                                                                <li><a href="{{ route('admin.invoices.show', $tx->invoice_id) }}">View Invoice</a></li>
+                                                            @endif
                                                             @if($tx->external_reference)
                                                                 <li><span class="dropdown-header">Ext Ref: {{ $tx->external_reference }}</span></li>
                                                             @endif

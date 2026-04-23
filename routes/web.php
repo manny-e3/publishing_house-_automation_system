@@ -8,18 +8,10 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SettingsController;
-
-
-Route::get('/clear-cache', function () {
-    Artisan::call('cache:clear');
-    Artisan::call('view:clear');
-    Artisan::call('config:clear');
-    Artisan::call('config:cache');
-    return "Cache cleared successfully!";
-});
-
-
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthorDashboardController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -49,6 +41,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/prospects', [AdminController::class, 'prospects'])->name('prospects.index');
     Route::get('/prospects/{prospect}', [AdminController::class, 'show'])->name('prospects.show');
     Route::patch('/prospects/{prospect}/status', [AdminController::class, 'updateStatus'])->name('prospects.status');
+    Route::post('/prospects/{prospect}/estimate', [AdminController::class, 'updateEstimate'])->name('prospects.update_estimate');
 
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/receipts', [InvoiceController::class, 'receiptsIndex'])->name('receipts.index');
@@ -68,6 +61,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
     Route::patch('/projects/{project}/stage', [ProjectController::class, 'updateStage'])->name('projects.update_stage');
 
+    // Access Control
+    Route::resource('users', UserController::class);
+    Route::resource('roles', RoleController::class)->except(['show', 'create']);
+
     // Settings
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('/pricing', [SettingsController::class, 'pricingIndex'])->name('pricing');
@@ -76,6 +73,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         
         Route::get('/criteria', [SettingsController::class, 'criteriaIndex'])->name('criteria');
         Route::post('/criteria', [SettingsController::class, 'criteriaStore'])->name('criteria.store');
+        Route::patch('/criteria/{criterion}', [SettingsController::class, 'criteriaUpdate'])->name('criteria.update');
         Route::delete('/criteria/{criterion}', [SettingsController::class, 'criteriaDelete'])->name('criteria.delete');
 
         Route::get('/global', [SettingsController::class, 'globalIndex'])->name('global');
@@ -87,6 +85,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 });
 
 // Payment Flow (Publicly accessible for authors)
-Route::get('/payments/{invoice}/pay/{gateway}', [PaymentController::class, 'initiate'])->name('payments.initiate');
+Route::get('/payments/{invoice}/checkout', [PaymentController::class, 'showCheckout'])->name('payments.checkout');
+Route::get('/payments/{invoice}/initiate', [PaymentController::class, 'initiate'])->name('payments.initiate');
+Route::get('/payments/success', function () {
+    return view('payments.success');
+})->name('payments.success');
+// Payments (Callback/Webhook)
 Route::get('/payments/callback/{gateway}', [PaymentController::class, 'callback'])->name('payments.callback');
+
+// Author Dashboard
+Route::prefix('author')->name('author.')->middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [AuthorDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/enquiries/create', [AuthorDashboardController::class, 'createEnquiry'])->name('enquiries.create');
+    Route::get('/enquiries/{prospect}', [AuthorDashboardController::class, 'showEnquiry'])->name('enquiries.show');
+    
+    Route::get('/invoices', [AuthorDashboardController::class, 'invoices'])->name('invoices');
+    Route::get('/transactions', [AuthorDashboardController::class, 'transactions'])->name('transactions');
+});
 

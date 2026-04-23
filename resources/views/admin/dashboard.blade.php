@@ -48,22 +48,26 @@
                                                         <div class="card-inner">
                                                             <div class="card-title-group align-start mb-2">
                                                                 <div class="card-title">
-                                                                    <h6 class="title">Sales Revenue</h6>
-                                                                    <p>In last 30 days revenue from subscription.</p>
+                                                                    <h6 class="title">Net Revenue</h6>
+                                                                    <p>Total revenue collected from paid invoices.</p>
                                                                 </div>
                                                                 <div class="card-tools">
-                                                                    <em class="card-hint icon ni ni-help-fill" data-bs-toggle="tooltip" data-bs-placement="left" title="Revenue from subscription"></em>
+                                                                    <em class="card-hint icon ni ni-help-fill" data-bs-toggle="tooltip" data-bs-placement="left" title="Sum of all successful payments"></em>
                                                                 </div>
                                                             </div>
                                                             <div class="align-end gy-3 gx-5 flex-wrap flex-md-nowrap flex-lg-wrap flex-xxl-nowrap">
                                                                 <div class="nk-sale-data-group flex-md-nowrap g-4">
                                                                     <div class="nk-sale-data">
-                                                                        <span class="amount">14,299.59 <span class="change down text-danger"><em class="icon ni ni-arrow-long-down"></em>16.93%</span></span>
-                                                                        <span class="sub-title">This Month</span>
+                                                                        <span class="amount">₦{{ number_format($totalRevenue, 2) }}</span>
+                                                                        <span class="sub-title">Lifetime Collection</span>
                                                                     </div>
                                                                     <div class="nk-sale-data">
-                                                                        <span class="amount">7,299.59 <span class="change up text-success"><em class="icon ni ni-arrow-long-up"></em>4.26%</span></span>
-                                                                        <span class="sub-title">This Week</span>
+                                                                        <span class="amount">₦{{ number_format($revenueThisMonth, 2) }} 
+                                                                            @if($revenueChange != 0)
+                                                                            <span class="change {{ $revenueChange >= 0 ? 'up text-success' : 'down text-danger' }}"><em class="icon ni ni-arrow-long-{{ $revenueChange >= 0 ? 'up' : 'down' }}"></em>{{ number_format(abs($revenueChange), 2) }}%</span>
+                                                                            @endif
+                                                                        </span>
+                                                                        <span class="sub-title">This Month</span>
                                                                     </div>
                                                                 </div>
                                                                 <div class="nk-sales-ck sales-revenue">
@@ -80,16 +84,16 @@
                                                                 <div class="card-inner">
                                                                     <div class="card-title-group align-start mb-2">
                                                                         <div class="card-title">
-                                                                            <h6 class="title">Active Subscriptions</h6>
+                                                                            <h6 class="title">Active Projects</h6>
                                                                         </div>
                                                                         <div class="card-tools">
-                                                                            <em class="card-hint icon ni ni-help-fill" data-bs-toggle="tooltip" data-bs-placement="left" title="Total active subscription"></em>
+                                                                            <em class="card-hint icon ni ni-help-fill" data-bs-toggle="tooltip" data-bs-placement="left" title="Total manuscripts currently in production"></em>
                                                                         </div>
                                                                     </div>
                                                                     <div class="align-end flex-sm-wrap g-4 flex-md-nowrap">
                                                                         <div class="nk-sale-data">
-                                                                            <span class="amount">9.69K</span>
-                                                                            <span class="sub-title"><span class="change down text-danger"><em class="icon ni ni-arrow-long-down"></em>1.93%</span>since last month</span>
+                                                                            <span class="amount">{{ $activeProjectsCount }}</span>
+                                                                            <span class="sub-title">Current Pipeline</span>
                                                                         </div>
                                                                         <div class="nk-sales-ck">
                                                                             <canvas class="sales-bar-chart" id="activeSubscription"></canvas>
@@ -103,16 +107,16 @@
                                                                 <div class="card-inner">
                                                                     <div class="card-title-group align-start mb-2">
                                                                         <div class="card-title">
-                                                                            <h6 class="title">Avg Subscriptions</h6>
+                                                                            <h6 class="title">New Prospects</h6>
                                                                         </div>
                                                                         <div class="card-tools">
-                                                                            <em class="card-hint icon ni ni-help-fill" data-bs-toggle="tooltip" data-bs-placement="left" title="Daily Avg. subscription"></em>
+                                                                            <em class="card-hint icon ni ni-help-fill" data-bs-toggle="tooltip" data-bs-placement="left" title="New enquiries received this month"></em>
                                                                         </div>
                                                                     </div>
                                                                     <div class="align-end flex-sm-wrap g-4 flex-md-nowrap">
                                                                         <div class="nk-sale-data">
-                                                                            <span class="amount">346.2</span>
-                                                                            <span class="sub-title"><span class="change up text-success"><em class="icon ni ni-arrow-long-up"></em>2.45%</span>since last week</span>
+                                                                            <span class="amount">{{ $newProspectsCount }}</span>
+                                                                            <span class="sub-title">This Month</span>
                                                                         </div>
                                                                         <div class="nk-sales-ck">
                                                                             <canvas class="sales-bar-chart" id="totalSubscription"></canvas>
@@ -130,34 +134,12 @@
                                                 <div class="card-inner">
                                                     <div class="card-title-group align-start gx-3 mb-3">
                                                         <div class="card-title">
-                                                            <h6 class="title">Sales Overview</h6>
-                                                            <p>In 30 days sales of product subscription. <a href="#">See Details</a></p>
-                                                        </div>
-                                                        <div class="card-tools">
-                                                            <div class="dropdown">
-                                                                <a href="#" class="btn btn-primary btn-dim d-none d-sm-inline-flex" data-bs-toggle="dropdown"><em class="icon ni ni-download-cloud"></em><span><span class="d-none d-md-inline">Download</span> Report</span></a>
-                                                                <a href="#" class="btn btn-icon btn-primary btn-dim d-sm-none" data-bs-toggle="dropdown"><em class="icon ni ni-download-cloud"></em></a>
-                                                                <div class="dropdown-menu dropdown-menu-end">
-                                                                    <ul class="link-list-opt no-bdr">
-                                                                        <li><a href="#"><span>Download Mini Version</span></a></li>
-                                                                        <li><a href="#"><span>Download Full Version</span></a></li>
-                                                                        <li class="divider"></li>
-                                                                        <li><a href="#"><em class="icon ni ni-opt-alt"></em><span>More Options</span></a></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
+                                                            <h6 class="title">Project Stage Distribution</h6>
+                                                            <p>Manuscripts categorized by their current operational stage.</p>
                                                         </div>
                                                     </div>
-                                                    <div class="nk-sale-data-group align-center justify-between gy-3 gx-5">
-                                                        <div class="nk-sale-data">
-                                                            <span class="amount">$82,944.60</span>
-                                                        </div>
-                                                        <div class="nk-sale-data">
-                                                            <span class="amount sm">1,937 <small>Subscribers</small></span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="nk-sales-ck large pt-4">
-                                                        <canvas class="sales-overview-chart" id="salesOverview"></canvas>
+                                                    <div class="nk-sales-ck large pt-4" style="max-height: 250px;">
+                                                        <canvas class="project-distribution-chart" id="projectDistribution"></canvas>
                                                     </div>
                                                 </div>
                                             </div><!-- .card -->
@@ -167,226 +149,47 @@
                                                 <div class="card-inner">
                                                     <div class="card-title-group">
                                                         <div class="card-title">
-                                                            <h6 class="title"><span class="me-2">Transaction</span> <a href="#" class="link d-none d-sm-inline">See History</a></h6>
-                                                        </div>
-                                                        <div class="card-tools">
-                                                            <ul class="card-tools-nav">
-                                                                <li><a href="#"><span>Paid</span></a></li>
-                                                                <li><a href="#"><span>Pending</span></a></li>
-                                                                <li class="active"><a href="#"><span>All</span></a></li>
-                                                            </ul>
+                                                            <h6 class="title"><span class="me-2">Recent Transactions</span></h6>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="card-inner p-0 border-top">
                                                     <div class="nk-tb-list nk-tb-orders">
                                                         <div class="nk-tb-item nk-tb-head">
-                                                            <div class="nk-tb-col"><span>Order No.</span></div>
-                                                            <div class="nk-tb-col tb-col-sm"><span>Customer</span></div>
+                                                            <div class="nk-tb-col"><span>Invoice No.</span></div>
+                                                            <div class="nk-tb-col"><span>Author</span></div>
                                                             <div class="nk-tb-col tb-col-md"><span>Date</span></div>
-                                                            <div class="nk-tb-col tb-col-lg"><span>Ref</span></div>
                                                             <div class="nk-tb-col"><span>Amount</span></div>
-                                                            <div class="nk-tb-col"><span class="d-none d-sm-inline">Status</span></div>
-                                                            <div class="nk-tb-col"><span>&nbsp;</span></div>
+                                                            <div class="nk-tb-col"><span>Status</span></div>
                                                         </div>
+                                                        @forelse($recentTransactions as $transaction)
                                                         <div class="nk-tb-item">
                                                             <div class="nk-tb-col">
-                                                                <span class="tb-lead"><a href="#">#95954</a></span>
+                                                                <span class="tb-lead"><a href="#">#{{ $transaction->invoice_number }}</a></span>
                                                             </div>
-                                                            <div class="nk-tb-col tb-col-sm">
+                                                            <div class="nk-tb-col">
                                                                 <div class="user-card">
-                                                                    <div class="user-avatar user-avatar-sm bg-purple">
-                                                                        <span>AB</span>
-                                                                    </div>
                                                                     <div class="user-name">
-                                                                        <span class="tb-lead">Abu Bin Ishtiyak</span>
+                                                                        <span class="tb-lead">{{ $transaction->prospect->name ?? 'Unknown' }}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             <div class="nk-tb-col tb-col-md">
-                                                                <span class="tb-sub">02/11/2020</span>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-lg">
-                                                                <span class="tb-sub text-primary">SUB-2309232</span>
+                                                                <span class="tb-sub">{{ $transaction->updated_at->format('d/m/Y') }}</span>
                                                             </div>
                                                             <div class="nk-tb-col">
-                                                                <span class="tb-sub tb-amount">4,596.75 <span>USD</span></span>
+                                                                <span class="tb-sub tb-amount">₦{{ number_format($transaction->total_paid, 2) }}</span>
                                                             </div>
                                                             <div class="nk-tb-col">
                                                                 <span class="badge badge-dot badge-dot-xs bg-success">Paid</span>
                                                             </div>
-                                                            <div class="nk-tb-col nk-tb-col-action">
-                                                                <div class="dropdown">
-                                                                    <a class="text-soft dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-                                                                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
-                                                                        <ul class="link-list-plain">
-                                                                            <li><a href="#">View</a></li>
-                                                                            <li><a href="#">Invoice</a></li>
-                                                                            <li><a href="#">Print</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
                                                         </div>
+                                                        @empty
                                                         <div class="nk-tb-item">
-                                                            <div class="nk-tb-col">
-                                                                <span class="tb-lead"><a href="#">#95850</a></span>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-sm">
-                                                                <div class="user-card">
-                                                                    <div class="user-avatar user-avatar-sm bg-azure">
-                                                                        <span>DE</span>
-                                                                    </div>
-                                                                    <div class="user-name">
-                                                                        <span class="tb-lead">Desiree Edwards</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-md">
-                                                                <span class="tb-sub">02/02/2020</span>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-lg">
-                                                                <span class="tb-sub text-primary">SUB-2309154</span>
-                                                            </div>
-                                                            <div class="nk-tb-col">
-                                                                <span class="tb-sub tb-amount">596.75 <span>USD</span></span>
-                                                            </div>
-                                                            <div class="nk-tb-col">
-                                                                <span class="badge badge-dot badge-dot-xs bg-danger">Canceled</span>
-                                                            </div>
-                                                            <div class="nk-tb-col nk-tb-col-action">
-                                                                <div class="dropdown">
-                                                                    <a class="text-soft dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-                                                                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
-                                                                        <ul class="link-list-plain">
-                                                                            <li><a href="#">View</a></li>
-                                                                            <li><a href="#">Remove</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                            <div class="nk-tb-col text-center" colspan="5">No recent transactions.</div>
                                                         </div>
-                                                        <div class="nk-tb-item">
-                                                            <div class="nk-tb-col">
-                                                                <span class="tb-lead"><a href="#">#95812</a></span>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-sm">
-                                                                <div class="user-card">
-                                                                    <div class="user-avatar user-avatar-sm bg-warning">
-                                                                        <img src="./images/avatar/b-sm.jpg" alt="">
-                                                                    </div>
-                                                                    <div class="user-name">
-                                                                        <span class="tb-lead">Blanca Schultz</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-md">
-                                                                <span class="tb-sub">02/01/2020</span>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-lg">
-                                                                <span class="tb-sub text-primary">SUB-2309143</span>
-                                                            </div>
-                                                            <div class="nk-tb-col">
-                                                                <span class="tb-sub tb-amount">199.99 <span>USD</span></span>
-                                                            </div>
-                                                            <div class="nk-tb-col">
-                                                                <span class="badge badge-dot badge-dot-xs bg-success">Paid</span>
-                                                            </div>
-                                                            <div class="nk-tb-col nk-tb-col-action">
-                                                                <div class="dropdown">
-                                                                    <a class="text-soft dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-                                                                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
-                                                                        <ul class="link-list-plain">
-                                                                            <li><a href="#">View</a></li>
-                                                                            <li><a href="#">Invoice</a></li>
-                                                                            <li><a href="#">Print</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="nk-tb-item">
-                                                            <div class="nk-tb-col">
-                                                                <span class="tb-lead"><a href="#">#95256</a></span>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-sm">
-                                                                <div class="user-card">
-                                                                    <div class="user-avatar user-avatar-sm bg-purple">
-                                                                        <span>NL</span>
-                                                                    </div>
-                                                                    <div class="user-name">
-                                                                        <span class="tb-lead">Naomi Lawrence</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-md">
-                                                                <span class="tb-sub">01/29/2020</span>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-lg">
-                                                                <span class="tb-sub text-primary">SUB-2305684</span>
-                                                            </div>
-                                                            <div class="nk-tb-col">
-                                                                <span class="tb-sub tb-amount">1099.99 <span>USD</span></span>
-                                                            </div>
-                                                            <div class="nk-tb-col">
-                                                                <span class="badge badge-dot badge-dot-xs bg-success">Paid</span>
-                                                            </div>
-                                                            <div class="nk-tb-col nk-tb-col-action">
-                                                                <div class="dropdown">
-                                                                    <a class="text-soft dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-                                                                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
-                                                                        <ul class="link-list-plain">
-                                                                            <li><a href="#">View</a></li>
-                                                                            <li><a href="#">Invoice</a></li>
-                                                                            <li><a href="#">Print</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="nk-tb-item">
-                                                            <div class="nk-tb-col">
-                                                                <span class="tb-lead"><a href="#">#95135</a></span>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-sm">
-                                                                <div class="user-card">
-                                                                    <div class="user-avatar user-avatar-sm bg-success">
-                                                                        <span>CH</span>
-                                                                    </div>
-                                                                    <div class="user-name">
-                                                                        <span class="tb-lead">Cassandra Hogan</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-md">
-                                                                <span class="tb-sub">01/29/2020</span>
-                                                            </div>
-                                                            <div class="nk-tb-col tb-col-lg">
-                                                                <span class="tb-sub text-primary">SUB-2305564</span>
-                                                            </div>
-                                                            <div class="nk-tb-col">
-                                                                <span class="tb-sub tb-amount">1099.99 <span>USD</span></span>
-                                                            </div>
-                                                            <div class="nk-tb-col">
-                                                                <span class="badge badge-dot badge-dot-xs bg-warning">Due</span>
-                                                            </div>
-                                                            <div class="nk-tb-col nk-tb-col-action">
-                                                                <div class="dropdown">
-                                                                    <a class="text-soft dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-                                                                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
-                                                                        <ul class="link-list-plain">
-                                                                            <li><a href="#">View</a></li>
-                                                                            <li><a href="#">Invoice</a></li>
-                                                                            <li><a href="#">Notify</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        @endforelse
                                                     </div>
-                                                </div>
-                                                <div class="card-inner-sm border-top text-center d-sm-none">
-                                                    <a href="#" class="btn btn-link btn-block">See History</a>
                                                 </div>
                                             </div><!-- .card -->
                                         </div><!-- .col -->
@@ -397,50 +200,26 @@
                                                         <div class="card-title">
                                                             <h6 class="title">Recent Activities</h6>
                                                         </div>
-                                                        <div class="card-tools">
-                                                            <ul class="card-tools-nav">
-                                                                <li><a href="#"><span>Cancel</span></a></li>
-                                                                <li class="active"><a href="#"><span>All</span></a></li>
-                                                            </ul>
-                                                        </div>
                                                     </div>
                                                 </div>
                                                 <ul class="nk-activity">
+                                                    @forelse($recentActivities as $activity)
                                                     <li class="nk-activity-item">
-                                                        <div class="nk-activity-media user-avatar bg-success"><img src="./images/avatar/c-sm.jpg" alt=""></div>
+                                                        <div class="nk-activity-media user-avatar bg-primary-dim">
+                                                            {{ strtoupper(substr($activity->user->name ?? 'S', 0, 2)) }}
+                                                        </div>
                                                         <div class="nk-activity-data">
-                                                            <div class="label">Keith Jensen requested to Widthdrawl.</div>
-                                                            <span class="time">2 hours ago</span>
+                                                            <div class="label">{{ $activity->action }} {{ class_basename($activity->model_type) }}</div>
+                                                            <span class="time">{{ $activity->created_at->diffForHumans() }}</span>
                                                         </div>
                                                     </li>
+                                                    @empty
                                                     <li class="nk-activity-item">
-                                                        <div class="nk-activity-media user-avatar bg-warning">HS</div>
                                                         <div class="nk-activity-data">
-                                                            <div class="label">Harry Simpson placed a Order.</div>
-                                                            <span class="time">2 hours ago</span>
+                                                            <div class="label">No recent activities.</div>
                                                         </div>
                                                     </li>
-                                                    <li class="nk-activity-item">
-                                                        <div class="nk-activity-media user-avatar bg-azure">SM</div>
-                                                        <div class="nk-activity-data">
-                                                            <div class="label">Stephanie Marshall got a huge bonus.</div>
-                                                            <span class="time">2 hours ago</span>
-                                                        </div>
-                                                    </li>
-                                                    <li class="nk-activity-item">
-                                                        <div class="nk-activity-media user-avatar bg-purple"><img src="./images/avatar/d-sm.jpg" alt=""></div>
-                                                        <div class="nk-activity-data">
-                                                            <div class="label">Nicholas Carr deposited funds.</div>
-                                                            <span class="time">2 hours ago</span>
-                                                        </div>
-                                                    </li>
-                                                    <li class="nk-activity-item">
-                                                        <div class="nk-activity-media user-avatar bg-pink">TM</div>
-                                                        <div class="nk-activity-data">
-                                                            <div class="label">Timothy Moreno placed a Order.</div>
-                                                            <span class="time">2 hours ago</span>
-                                                        </div>
-                                                    </li>
+                                                    @endforelse
                                                 </ul>
                                             </div><!-- .card -->
                                         </div><!-- .col -->
@@ -661,3 +440,106 @@
                     </div>
                 </div>
 @endsection
+
+@push('scripts')
+<script>
+    (function (NioApp, $) {
+        'use strict';
+
+        var projectDistributionData = {
+            labels: @json($stageLabels),
+            dataUnit: 'Projects',
+            datasets: [{
+                label: "Projects",
+                color: "#9d72ff",
+                background: NioApp.hexRGB('#9d72ff', .2),
+                data: @json($stageCounts)
+            }]
+        };
+
+        function projectDistributionChart(selector, set_data) {
+            var $selector = $(selector || '.project-distribution-chart');
+            $selector.each(function () {
+                var $self = $(this),
+                    _self_id = $self.attr('id'),
+                    _get_data = projectDistributionData,
+                    _canvas = document.getElementById(_self_id).getContext("2d");
+
+                var chart_data = [];
+                for (var i = 0; i < _get_data.datasets.length; i++) {
+                    chart_data.push({
+                        label: _get_data.datasets[i].label,
+                        data: _get_data.datasets[i].data,
+                        backgroundColor: _get_data.datasets[i].background,
+                        borderWidth: 2,
+                        borderColor: _get_data.datasets[i].color,
+                        hoverBackgroundColor: _get_data.datasets[i].background,
+                        hoverBorderColor: _get_data.datasets[i].color,
+                    });
+                }
+                var chart = new Chart(_canvas, {
+                    type: 'bar',
+                    data: {
+                        labels: _get_data.labels,
+                        datasets: chart_data,
+                    },
+                    options: {
+                        legend: {
+                            display: false
+                        },
+                        maintainAspectRatio: false,
+                        tooltips: {
+                            enabled: true,
+                            backgroundColor: '#eff6ff',
+                            titleFontSize: 13,
+                            titleFontColor: '#6783b8',
+                            titleMarginBottom: 6,
+                            bodyFontColor: '#9eaecf',
+                            bodyFontSize: 12,
+                            bodySpacing: 4,
+                            yPadding: 10,
+                            xPadding: 10,
+                            displayColors: false
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    beginAtZero: true,
+                                    fontSize: 12,
+                                    fontColor: '#9eaecf',
+                                    padding: 10,
+                                    stepSize: 5
+                                },
+                                gridLines: {
+                                    color: NioApp.hexRGB('#526484', .2),
+                                    tickMarkLength: 0,
+                                    zeroLineColor: NioApp.hexRGB('#526484', .2)
+                                },
+                            }],
+                            xAxes: [{
+                                display: true,
+                                ticks: {
+                                    fontSize: 12,
+                                    fontColor: '#9eaecf',
+                                    padding: 5
+                                },
+                                gridLines: {
+                                    color: "transparent",
+                                    tickMarkLength: 10,
+                                    zeroLineColor: 'transparent',
+                                }
+                            }]
+                        }
+                    }
+                });
+            });
+        }
+
+        NioApp.comms.docReady.push(function () {
+            projectDistributionChart();
+        });
+
+    })(NioApp, jQuery);
+</script>
+@endpush

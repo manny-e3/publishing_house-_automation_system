@@ -12,9 +12,11 @@ class PaymentSuccessful
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $invoice;
+    public $paymentType;
 
-    public function __construct(Invoice $invoice)
+    public function __construct(Invoice $invoice, string $paymentType = 'initial')
     {
         $this->invoice = $invoice;
+        $this->paymentType = $paymentType;
     }
 }

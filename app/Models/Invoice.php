@@ -16,13 +16,18 @@ class Invoice extends Model
         'status', 
         'payment_reference', 
         'paid_at',
-        'allowed_gateways'
+        'allowed_gateways',
+        'payment_plans',
+        'min_deposit_percentage',
+        'total_paid',
+        'is_installment'
     ];
 
     protected $casts = [
         'paid_at' => 'datetime',
         'amount' => 'decimal:2',
         'allowed_gateways' => 'array',
+        'payment_plans' => 'array',
     ];
 
     public function prospect(): BelongsTo

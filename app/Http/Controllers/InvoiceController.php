@@ -7,7 +7,9 @@ use App\Models\Prospect;
 use App\Models\Project;
 use App\Models\PaymentGateway;
 use App\Models\Transaction;
-use App\Mail\ProjectStatusUpdated;
+use App\Models\Setting;
+use App\Events\PaymentSuccessful;
+use App\Events\ProjectStageUpdated;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -37,7 +39,8 @@ class InvoiceController extends Controller
     {
         $prospect = Prospect::findOrFail($request->prospect_id);
         $gateways = PaymentGateway::where('is_active', true)->get();
-        return view('admin.invoices.create', compact('prospect', 'gateways'));
+        $minDeposit = Setting::where('key', 'min_deposit_percentage')->first()->value ?? 40;
+        return view('admin.invoices.create', compact('prospect', 'gateways', 'minDeposit'));
     }
 
     public function show(Invoice $invoice)
@@ -74,6 +77,7 @@ class InvoiceController extends Controller
         return view('admin.settings.gateways', compact('gateways'));
     }
 
+
     public function updateGateway(Request $request, PaymentGateway $gateway)
     {
         $gateway->update([
@@ -90,6 +94,7 @@ class InvoiceController extends Controller
             'prospect_id' => 'required|exists:prospects,id',
             'amount' => 'required|numeric|min:0',
             'allowed_gateways' => 'required|array|min:1',
+            'min_deposit_percentage' => 'required|integer|min:0|max:100',
         ]);
 
         $invoice = Invoice::create([
@@ -97,6 +102,7 @@ class InvoiceController extends Controller
             'invoice_number' => 'INV-' . strtoupper(Str::random(8)),
             'amount' => $validated['amount'],
             'allowed_gateways' => $validated['allowed_gateways'],
+            'min_deposit_percentage' => $validated['min_deposit_percentage'],
             'status' => 'unpaid'
         ]);
 
@@ -110,9 +116,20 @@ class InvoiceController extends Controller
         // Mark invoice as paid
         $invoice->update([
             'status' => 'paid',
+            'total_paid' => $invoice->amount, // Manual confirmation assumes full payment unless we add an amount input
+            'is_installment' => false,
             'paid_at' => now(),
             'payment_reference' => 'MANUAL-' . strtoupper(Str::random(6)),
         ]);
+        
+        $invoice->refresh(); // Ensure it's fresh for events
+
+        // This event will trigger:
+        // 1. User account creation (if guest)
+        // 2. Author credentials email
+        // 3. Finance alert (N-06)
+        // 4. Editorial alert (N-07)
+        event(new PaymentSuccessful($invoice));
 
         // Activate Project
         $project = Project::create([
@@ -121,12 +138,8 @@ class InvoiceController extends Controller
             'status' => 'editing'
         ]);
 
-        // Trigger Automation: Notify the Author that logic has started
-        try {
-            Mail::to($invoice->prospect->email)->send(new ProjectStatusUpdated($project, 'editing'));
-        } catch (\Exception $e) {
-            \Log::error('Failed to send activation email: ' . $e->getMessage());
-        }
+        // This event will trigger author and internal team notifications for the 'editing' stage
+        event(new ProjectStageUpdated($project, 'editing'));
 
         // Update Prospect to signify it is now in active pipeline
         $invoice->prospect->update(['status' => 'project_active']);

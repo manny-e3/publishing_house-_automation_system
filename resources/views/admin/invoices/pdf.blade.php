@@ -55,7 +55,10 @@
                     <td style="text-align: right;">
                         <div style="color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 5px;">Invoice Summary</div>
                         Date: {{ $invoice->created_at->format('d M, Y') }}<br>
-                        Status: <span class="status-badge status-{{ $invoice->status }}">{{ $invoice->status }}</span>
+                        Status: <span class="status-badge status-{{ $invoice->status }}">{{ $invoice->is_installment ? 'Installment Paid' : $invoice->status }}</span>
+                        @if($invoice->is_installment)
+                        <br>Balance: ₦{{ number_format($invoice->amount - $invoice->total_paid, 2) }}
+                        @endif
                     </td>
                 </tr>
             </table>
@@ -89,6 +92,16 @@
                     <td>VAT (0%)</td>
                     <td>₦0.00</td>
                 </tr>
+                @if($invoice->is_installment)
+                <tr>
+                    <td style="color: #888;">Total Paid (Installments)</td>
+                    <td style="color: #1a1;">₦{{ number_format($invoice->total_paid, 2) }}</td>
+                </tr>
+                <tr>
+                    <td style="color: #888;">Balance Due</td>
+                    <td style="color: #d11; font-weight: bold;">₦{{ number_format($invoice->amount - $invoice->total_paid, 2) }}</td>
+                </tr>
+                @endif
                 <tr class="total-row">
                     <td>Total</td>
                     <td>₦{{ number_format($invoice->amount, 2) }}</td>

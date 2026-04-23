@@ -37,7 +37,7 @@ class ManuscriptAccepted extends Mailable
         return new Content(
             view: 'emails.manuscript_accepted',
             with: [
-                'paymentLink' => route('payments.initiate', ['invoice' => $this->invoice->id, 'gateway' => 'paystack']),
+                'checkoutLink' => route('payments.checkout', ['invoice' => $this->invoice->id]),
             ]
         );
     }

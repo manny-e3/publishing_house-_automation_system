@@ -13,7 +13,7 @@ class PaymentService
     /**
      * Initialize payment and get redirect URL
      */
-    public function initializePayment(Invoice $invoice, string $gatewaySlug)
+    public function initializePayment(Invoice $invoice, string $gatewaySlug, $customAmount = null)
     {
         $gateway = PaymentGateway::where('slug', $gatewaySlug)->first();
         
@@ -21,74 +21,77 @@ class PaymentService
             throw new \Exception("Payment gateway not available.");
         }
 
+        $amount = $customAmount ?? $invoice->amount;
+
         switch ($gatewaySlug) {
             case 'paystack':
-                return $this->initializePaystack($invoice, $gateway->config);
+                return $this->initializePaystack($invoice, $gateway->config, $amount);
             case 'flutterwave':
-                return $this->initializeFlutterwave($invoice, $gateway->config);
+                return $this->initializeFlutterwave($invoice, $gateway->config, $amount);
             default:
                 throw new \Exception("Gateway integration pending.");
         }
     }
 
-private function initializePaystack(Invoice $invoice, array $config)
-{
-    $url = "https://api.paystack.co/transaction/initialize";
+    private function initializePaystack(Invoice $invoice, array $config, $amount)
+    {
+        $url = "https://api.paystack.co/transaction/initialize";
 
-    if (empty($config['secret_key'])) {
-        throw new \Exception("Paystack Secret Key is missing in Payment Settings.");
-    }
+        if (empty($config['secret_key'])) {
+            throw new \Exception("Paystack Secret Key is missing in Payment Settings.");
+        }
 
-    $reference = $invoice->invoice_number . '_' . time();
+        $reference = $invoice->invoice_number . '_' . time();
 
-    $response = Http::withHeaders([
-        'Authorization' => 'Bearer ' . $config['secret_key'],
-        'Content-Type'  => 'application/json',
-        'User-Agent'    => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Expect'        => '',
-    ])
-    ->withOptions([
-        'verify' => false,
-        'curl' => [
-            CURLOPT_SSLVERSION      => CURL_SSLVERSION_TLSv1_2,
-            CURLOPT_IPRESOLVE       => CURL_IPRESOLVE_V4,
-            CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
-        ]
-    ])
-    ->post($url, [
-        'email'        => $invoice->prospect->email,
-        'amount'       => $invoice->amount * 100,
-        'reference'    => $reference,
-        'callback_url' => route('payments.callback', ['gateway' => 'paystack']),
-        'metadata'     => [
-            'invoice_id'  => $invoice->id,
-            'prospect_id' => $invoice->prospect_id,
-        ],
-    ]);
-
-    if ($response->successful()) {
-        $data = $response->json()['data'];
-
-        Transaction::create([
-            'invoice_id'            => $invoice->id,
-            'gateway_slug'          => 'paystack',
-            'transaction_reference' => $reference,
-            'amount'                => $invoice->amount,
-            'status'                => 'pending',
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $config['secret_key'],
+            'Content-Type'  => 'application/json',
+            'User-Agent'    => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Expect'        => '',
+        ])
+        ->withOptions([
+            'verify' => false,
+            'curl' => [
+                CURLOPT_SSLVERSION      => CURL_SSLVERSION_TLSv1_2,
+                CURLOPT_IPRESOLVE       => CURL_IPRESOLVE_V4,
+                CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
+            ]
+        ])
+        ->post($url, [
+            'email'        => $invoice->prospect->email,
+            'amount'       => $amount * 100,
+            'reference'    => $reference,
+            'callback_url' => route('payments.callback', ['gateway' => 'paystack']),
+            'metadata'     => [
+                'invoice_id'  => $invoice->id,
+                'prospect_id' => $invoice->prospect_id,
+            ],
         ]);
 
-        return $data['authorization_url'];
+        if ($response->successful()) {
+            $data = $response->json()['data'];
+
+            Transaction::create([
+                'invoice_id'            => $invoice->id,
+                'gateway_slug'          => 'paystack',
+                'transaction_reference' => $reference,
+                'amount'                => $amount,
+                'status'                => 'pending',
+            ]);
+
+            return $data['authorization_url'];
+        }
+
+        Log::error('Paystack Init Failed', [
+            'status'  => $response->status(),
+            'body'    => $response->body(),
+            'invoice' => $invoice->id,
+        ]);
+
+        throw new \Exception("Could not initialize Paystack payment.");
     }
 
-    Log::error('Paystack Init Failed', [
-        'status'  => $response->status(),
-        'body'    => $response->body(),
-        'invoice' => $invoice->id,
-    ]);
-
-    throw new \Exception("Could not initialize Paystack payment.");
-}
-    private function initializeFlutterwave(Invoice $invoice, array $config)
+    private function initializeFlutterwave(Invoice $invoice, array $config, $amount)
     {
         $url = "https://api.flutterwave.com/v3/payments";
         
@@ -114,7 +117,7 @@ private function initializePaystack(Invoice $invoice, array $config)
         ])
         ->post($url, [
             'tx_ref' => $txRef,
-            'amount' => $invoice->amount,
+            'amount' => $amount,
             'currency' => "NGN",
             'redirect_url' => route('payments.callback', ['gateway' => 'flutterwave']),
             'customer' => [
@@ -138,7 +141,7 @@ private function initializePaystack(Invoice $invoice, array $config)
                 'invoice_id' => $invoice->id,
                 'gateway_slug' => 'flutterwave',
                 'transaction_reference' => $txRef,
-                'amount' => $invoice->amount,
+                'amount' => $amount,
                 'status' => 'pending'
             ]);
 

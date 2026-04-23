@@ -12,6 +12,10 @@ use App\Mail\ProjectStatusUpdated;
 use App\Mail\AuthorAcknowledgment;
 use App\Mail\ManuscriptAccepted as ManuscriptAcceptedMail;
 use App\Mail\ManuscriptRejected as ManuscriptRejectedMail;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use App\Mail\AuthorAccountCreated;
 use App\Mail\PaymentSuccessfulMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -44,13 +48,11 @@ class SendAuthorNotifications
             // Author Acknowledgment
             Mail::to($event->prospect->email)->send(new AuthorAcknowledgment($event->prospect));
             
-            // Acquisitions Team Alert (N-02)
-            $acquisitionsEmail = \App\Models\Setting::where('key', 'acquisitions_email')->value('value') 
-                ?? \App\Models\Setting::where('key', 'support_email')->value('value') 
-                ?? config('mail.from.address');
+            // Internal Alert: Acquisitions Team & Admins
+            $recipients = User::role(['acquisitions', 'admin'])->pluck('email')->unique();
             
-            if ($acquisitionsEmail) {
-                Mail::to($acquisitionsEmail)->send(new \App\Mail\NewProspectAlert($event->prospect));
+            if ($recipients->isNotEmpty()) {
+                Mail::to($recipients)->send(new \App\Mail\NewProspectAlert($event->prospect));
             }
         } catch (\Exception $e) {
             Log::error('Prospect Notification Failed: ' . $e->getMessage());
@@ -78,25 +80,47 @@ class SendAuthorNotifications
     private function handlePaymentSuccessful($event)
     {
         try {
-            // 1. Notify Author (N-05)
-            Mail::to($event->invoice->prospect->email)->send(new PaymentSuccessfulMail($event->invoice));
+            $prospect = $event->invoice->prospect;
+            $user = User::where('email', $prospect->email)->first();
+            $newAccount = false;
+            $randomPassword = null;
+
+            if (!$user) {
+                $randomPassword = Str::random(10);
+                $user = User::create([
+                    'name' => $prospect->name,
+                    'email' => $prospect->email,
+                    'password' => Hash::make($randomPassword)
+                ]);
+                $user->assignRole('prospect');
+                $newAccount = true;
+            }
+
+            // Link prospect to user
+            $prospect->update(['user_id' => $user->id]);
+
+            // 1. Notify Author of Payment Success (N-05)
+            if ($event->paymentType === 'balance') {
+                Mail::to($prospect->email)->send(new \App\Mail\BalancePaymentSuccessfulMail($event->invoice));
+            } else {
+                Mail::to($prospect->email)->send(new PaymentSuccessfulMail($event->invoice));
+            }
+
+            // 1a. Send Credentials if new account (FR-07)
+            if ($newAccount) {
+                Mail::to($prospect->email)->send(new AuthorAccountCreated($user, $randomPassword));
+            }
 
             // 2. Notify Finance/Management (N-06)
-            $financeEmail = \App\Models\Setting::where('key', 'finance_email')->value('value') 
-                ?? \App\Models\Setting::where('key', 'support_email')->value('value')
-                ?? config('mail.from.address');
-            
-            if ($financeEmail) {
-                Mail::to($financeEmail)->send(new \App\Mail\PaymentReceiptAlert($event->invoice));
+            $financeRecipients = User::role(['finance', 'admin'])->pluck('email')->unique();
+            if ($financeRecipients->isNotEmpty()) {
+                Mail::to($financeRecipients)->send(new \App\Mail\PaymentReceiptAlert($event->invoice));
             }
 
             // 3. Notify Editorial Team (N-07)
-            $editorialEmail = \App\Models\Setting::where('key', 'editorial_email')->value('value') 
-                ?? \App\Models\Setting::where('key', 'support_email')->value('value')
-                ?? config('mail.from.address');
-
-            if ($editorialEmail) {
-                Mail::to($editorialEmail)->send(new \App\Mail\NewProjectAlert($event->invoice));
+            $editorialRecipients = User::role(['editorial', 'admin'])->pluck('email')->unique();
+            if ($editorialRecipients->isNotEmpty()) {
+                Mail::to($editorialRecipients)->send(new \App\Mail\NewProjectAlert($event->invoice));
             }
 
         } catch (\Exception $e) {
@@ -111,19 +135,19 @@ class SendAuthorNotifications
             Mail::to($event->project->prospect->email)->send(new ProjectStatusUpdated($event->project, $event->stage));
 
             // 2. Route Internal Alert (N-08 to N-12)
-            $teamKey = match($event->stage) {
-                'editing', 'formatting' => 'editorial_email',
-                'cover_design'          => 'design_email',
-                'printing', 'distribution', 'completed' => 'logistics_email',
-                default                 => 'support_email',
+            $targetRole = match($event->stage) {
+                'editing', 'formatting' => 'editorial',
+                'book_cover_isbn'       => 'design',
+                'printing', 'distribution', 'sales_promotion' => 'logistics',
+                default                 => 'admin',
             };
 
-            $teamEmail = \App\Models\Setting::where('key', $teamKey)->value('value')
-                ?? \App\Models\Setting::where('key', 'support_email')->value('value')
-                ?? config('mail.from.address');
+            // Fetch recipients for the specific role + always include admin
+            $rolesToNotify = [$targetRole, 'admin'];
+            $recipients = User::role($rolesToNotify)->pluck('email')->unique();
 
-            if ($teamEmail) {
-                Mail::to($teamEmail)->send(new \App\Mail\DevelopmentStageAlert($event->project, $event->stage));
+            if ($recipients->isNotEmpty()) {
+                Mail::to($recipients)->send(new \App\Mail\DevelopmentStageAlert($event->project, $event->stage));
             }
 
         } catch (\Exception $e) {

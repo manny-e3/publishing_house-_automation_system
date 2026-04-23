@@ -29,11 +29,11 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Assign default role
-        $user->assignRole('editorial');
+        // Assign default role (prospect/author)
+        $user->assignRole('prospect');
 
         Auth::login($user);
 
-        return redirect()->route('admin.dashboard');
+        return redirect()->route('author.dashboard');
     }
 }

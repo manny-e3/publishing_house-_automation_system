@@ -11,11 +11,19 @@ class EnquiryController extends Controller
     public function enquiry()
     {
         $rates = \App\Models\PricingRate::all()->pluck('value', 'key');
-        return view('enquiry', compact('rates'));
+        $groupedRates = \App\Models\PricingRate::all()->groupBy('category');
+        return view('enquiry', compact('rates', 'groupedRates'));
     }
 
     public function store(Request $request)
     {
+        // Convert checkbox "on" values to boolean
+        $request->merge([
+            'is_hard_cover' => $request->has('is_hard_cover'),
+            'is_embossed' => $request->has('is_embossed'),
+            'is_packaged' => $request->has('is_packaged'),
+        ]);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -28,6 +36,13 @@ class EnquiryController extends Controller
             'services' => 'required|array|min:1',
             'services.*' => 'in:editing,formatting,cover,printing',
             
+            'print_quantity' => 'nullable|integer|min:1',
+            'interior_paper' => 'nullable|string|exists:pricing_rates,key',
+            'cover_paper' => 'nullable|string|exists:pricing_rates,key',
+            'is_hard_cover' => 'boolean',
+            'is_embossed' => 'boolean',
+            'is_packaged' => 'boolean',
+
             'manuscript_file' => 'required|file|mimes:pdf,doc,docx|max:10240',
             'cover_design_file' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:10240',
             
@@ -59,6 +74,7 @@ class EnquiryController extends Controller
         }
 
         $prospect = Prospect::create([
+            'user_id' => \Illuminate\Support\Facades\Auth::id(),
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone_number' => $validated['phone_number'],
@@ -69,13 +85,20 @@ class EnquiryController extends Controller
             'number_of_words' => $validated['number_of_words'],
             'quote_for_services' => $validated['services'],
             
+            'print_quantity' => $validated['print_quantity'] ?? 1,
+            'interior_paper' => $validated['interior_paper'] ?? null,
+            'cover_paper' => $validated['cover_paper'] ?? null,
+            'is_hard_cover' => $validated['is_hard_cover'] ?? false,
+            'is_embossed' => $validated['is_embossed'] ?? false,
+            'is_packaged' => $validated['is_packaged'] ?? false,
+
             'manuscript_file_path' => $filePath,
             'cover_design_path' => $coverDesignPath,
             
             'agreement_name' => $validated['agreement_name'],
             'agreement_terms' => true,
             'ip_address' => $request->ip(),
-            'estimated_cost' => $estimatedCost,
+            'estimated_cost' => $request->estimated_cost ?? $estimatedCost, // Use the client-side calculated cost if provided
         ]);
 
         event(new ProspectSubmitted($prospect));

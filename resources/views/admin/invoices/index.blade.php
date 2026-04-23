@@ -97,7 +97,15 @@
                                                 </span>
                                                 <span class="tb-odr-status">
                                                     @if($invoice->status == 'paid')
-                                                        <span class="badge badge-dot bg-success">Paid</span>
+                                                        @php 
+                                                            $isPartial = $invoice->total_paid > 0 && $invoice->total_paid < $invoice->amount;
+                                                        @endphp
+                                                        @if($isPartial)
+                                                            <span class="badge badge-dot bg-info">Partially Paid</span>
+                                                            <div class="text-soft smaller">Paid: ₦{{ number_format($invoice->total_paid, 2) }} / ₦{{ number_format($invoice->amount, 2) }}</div>
+                                                        @else
+                                                            <span class="badge badge-dot bg-success">Paid</span>
+                                                        @endif
                                                     @elseif($invoice->status == 'unpaid')
                                                         <span class="badge badge-dot bg-warning">Unpaid</span>
                                                     @else
@@ -130,7 +138,7 @@
                             </div><!-- .card-inner -->
                             @if($invoices->hasPages() ?? false)
                             <div class="card-inner">
-                                {{ $invoices->links('vendor.pagination.bootstrap-5') }}
+                                {{ $invoices->links() }}
                             </div><!-- .card-inner -->
                             @endif
                         </div><!-- .card-inner-group -->

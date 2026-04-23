@@ -31,17 +31,19 @@ class RolesAndPermissionsSeeder extends Seeder
         }
 
         // Create Roles and Assign Permissions
-        $adminRole = Role::create(['name' => 'admin']);
+        $adminRole = Role::findOrCreate('admin');
         $adminRole->givePermissionTo(Permission::all());
 
-        $acquisitionsRole = Role::create(['name' => 'acquisitions']);
+        $acquisitionsRole = Role::findOrCreate('acquisitions');
         $acquisitionsRole->givePermissionTo(['view prospects', 'manage manuscripts']);
 
-        $financeRole = Role::create(['name' => 'finance']);
+        $financeRole = Role::findOrCreate('finance');
         $financeRole->givePermissionTo(['view invoices', 'manage payments', 'configure gateways']);
 
-        $editorialRole = Role::create(['name' => 'editorial']);
+        $editorialRole = Role::findOrCreate('editorial');
         $editorialRole->givePermissionTo(['view projects', 'update project stages']);
+
+        $prospectRole = Role::findOrCreate('prospect'); // Author Dashboard Access
 
         // Create Test Users
         $this->createUser('Admin', 'admin@thecuratedarchive.com', 'admin', $adminRole);
