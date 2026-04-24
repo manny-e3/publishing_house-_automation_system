@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\Invoice;
 use App\Models\Prospect;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;

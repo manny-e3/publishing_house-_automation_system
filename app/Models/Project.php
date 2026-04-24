@@ -68,4 +68,14 @@ class Project extends Model
     {
         return $this->hasOne(Invoice::class, 'payment_reference', 'payment_reference');
     }
+
+    public function contracts()
+    {
+        return $this->hasMany(Contract::class);
+    }
+
+    public function latestContract()
+    {
+        return $this->hasOne(Contract::class)->latestOfMany();
+    }
 }

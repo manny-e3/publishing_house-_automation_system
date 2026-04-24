@@ -78,6 +78,15 @@
                                 </li>
                                 @endrole
 
+                                @hasanyrole('admin|acquisitions|legal')
+                                <li class="nk-menu-item">
+                                    <a href="{{ route('admin.contracts.index') }}" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-file-text"></em></span>
+                                        <span class="nk-menu-text">Legal & Contracts</span>
+                                    </a>
+                                </li>
+                                @endrole
+
                                 @hasrole('admin')
                                 <li class="nk-menu-heading">
                                     <h6 class="overline-title text-soft">Access Control</h6>

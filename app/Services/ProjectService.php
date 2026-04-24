@@ -39,7 +39,7 @@ class ProjectService
     public function getAuthorDashboardData(int $userId, string $email): array
     {
         // Fetch matching enquiries/prospects
-        $enquiries = Prospect::with('project')
+        $enquiries = Prospect::with(['project.latestContract'])
             ->where('user_id', $userId)
             ->orWhere('email', $email)
             ->latest()
@@ -54,6 +54,38 @@ class ProjectService
 
         return [
             'enquiries' => $enquiries
+        ];
+    }
+
+    /**
+     * Get aggregate summary for the author dashboard.
+     */
+    public function getAuthorSummary(int $userId, string $email): array
+    {
+        $enquiries = Prospect::with(['project.latestContract'])
+            ->where('user_id', $userId)
+            ->orWhere('email', $email)
+            ->get();
+
+        $activeProjects = $enquiries->filter(fn($e) => $e->project)->count();
+        $pendingEnquiries = $enquiries->where('status', 'pending')->count();
+        
+        $pendingSignatures = $enquiries->filter(function($e) {
+            return $e->project && 
+                   $e->project->latestContract && 
+                   $e->project->latestContract->status !== 'signed';
+        });
+
+        $unpaidInvoices = Invoice::whereHas('prospect', function ($query) use ($userId, $email) {
+            $query->where('user_id', $userId)->orWhere('email', $email);
+        })->where('status', 'pending')->count();
+
+        return [
+            'activeProjectsCount' => $activeProjects,
+            'pendingEnquiriesCount' => $pendingEnquiries,
+            'pendingSignatures' => $pendingSignatures,
+            'unpaidInvoicesCount' => $unpaidInvoices,
+            'recentEnquiries' => $enquiries->sortByDesc('created_at')->take(3)
         ];
     }
 

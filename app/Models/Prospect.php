@@ -36,4 +36,9 @@ class Prospect extends Model
     {
         return $this->hasMany(Invoice::class);
     }
+
+    public function contracts()
+    {
+        return $this->hasMany(Contract::class);
+    }
 }

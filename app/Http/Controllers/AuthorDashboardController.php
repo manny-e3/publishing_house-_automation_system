@@ -22,8 +22,15 @@ class AuthorDashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $data = $this->projectService->getAuthorDashboardData($user->id, $user->email);
+        $data = $this->projectService->getAuthorSummary($user->id, $user->email);
         return view('author.dashboard', $data);
+    }
+
+    public function enquiries()
+    {
+        $user = Auth::user();
+        $data = $this->projectService->getAuthorDashboardData($user->id, $user->email);
+        return view('author.enquiries.index', $data);
     }
 
     public function showEnquiry(Prospect $prospect)

@@ -61,6 +61,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
     Route::patch('/projects/{project}/stage', [ProjectController::class, 'updateStage'])->name('projects.update_stage');
 
+    Route::get('/contracts', [\App\Http\Controllers\Admin\ContractController::class, 'index'])->name('contracts.index');
+    Route::get('/contracts/{contract}/download', [\App\Http\Controllers\Admin\ContractController::class, 'download'])->name('contracts.download');
+
     // Access Control
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class)->except(['show', 'create']);
@@ -94,12 +97,17 @@ Route::get('/payments/success', function () {
 Route::get('/payments/callback/{gateway}', [PaymentController::class, 'callback'])->name('payments.callback');
 
 // Author Dashboard
-Route::prefix('author')->name('author.')->middleware(['auth'])->group(function () {
+Route::group(['prefix' => 'author', 'as' => 'author.', 'middleware' => ['auth']], function () {
     Route::get('/dashboard', [AuthorDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/enquiries', [AuthorDashboardController::class, 'enquiries'])->name('enquiries.index');
     Route::get('/enquiries/create', [AuthorDashboardController::class, 'createEnquiry'])->name('enquiries.create');
     Route::get('/enquiries/{prospect}', [AuthorDashboardController::class, 'showEnquiry'])->name('enquiries.show');
     
     Route::get('/invoices', [AuthorDashboardController::class, 'invoices'])->name('invoices');
     Route::get('/transactions', [AuthorDashboardController::class, 'transactions'])->name('transactions');
+
+    // Contracts
+    Route::get('/contracts/{contract}', [\App\Http\Controllers\ContractController::class, 'show'])->name('contracts.show');
+    Route::post('/contracts/{contract}/sign', [\App\Http\Controllers\ContractController::class, 'sign'])->name('contracts.sign');
 });
 

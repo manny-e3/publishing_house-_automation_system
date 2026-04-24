@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Storage;
 
 class ProspectService
 {
+    protected $contractService;
+
+    public function __construct(ContractService $contractService)
+    {
+        $this->contractService = $contractService;
+    }
+
     /**
      * Handle the submission of a new manuscript enquiry.
      */
@@ -53,7 +60,13 @@ class ProspectService
             'estimated_cost' => $data['client_side_cost'] ?? $estimatedCost,
         ]);
 
-        // 4. Dispatch Event
+        // 4. Generate & Auto-Sign Submission Agreement
+        $this->contractService->generateSubmissionContract($prospect, [
+            'name' => $data['agreement_name'],
+            'ip' => $ipAddress
+        ]);
+
+        // 5. Dispatch Event
         event(new ProspectSubmitted($prospect));
 
         return $prospect;

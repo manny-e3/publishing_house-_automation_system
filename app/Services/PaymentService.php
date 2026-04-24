@@ -18,6 +18,13 @@ use App\Events\ProjectStageUpdated;
 
 class PaymentService
 {
+    protected $contractService;
+
+    public function __construct(ContractService $contractService)
+    {
+        $this->contractService = $contractService;
+    }
+
     /**
      * Initialize payment and get redirect URL
      */
@@ -230,6 +237,13 @@ class PaymentService
                 'payment_reference' => $invoice->payment_reference,
                 'status' => 'editing'
             ]);
+
+            // Auto-generate publishing agreement
+            try {
+                $this->contractService->generateContract($project);
+            } catch (\Exception $e) {
+                Log::error('Contract Auto-Generation Failed: ' . $e->getMessage());
+            }
 
             // Notify via event
             event(new ProjectStageUpdated($project, 'editing'));

@@ -54,11 +54,13 @@
                             <div class="text-right w-full mb-3 text-lg font-bold text-gray-900">
                                 ₦{{ number_format($invoice->amount, 2) }}
                             </div>
+                            @if($invoice->status !== 'paid')
                             <div class="flex gap-2 w-full sm:w-auto justify-end">
                                 <a href="{{ route('payments.checkout', $invoice->id) }}" class="inline-flex justify-center items-center px-4 py-2 bg-navy-950 text-white rounded-sm text-xs font-bold tracking-widest hover:bg-navy-900 transition-colors">
                                     VIEW INVOICE / PAY
                                 </a>
                             </div>
+                            @endif
                         </div>
                     </div>
                 </li>

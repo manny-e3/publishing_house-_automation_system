@@ -84,7 +84,7 @@
         </div>
         @endif
 
-        <form action="{{ route('enquiry.store') }}" method="POST" enctype="multipart/form-data" x-data="enquiryForm">
+        <form action="{{ route('enquiry.store') }}" method="POST" enctype="multipart/form-data" x-data="enquiryForm" @submit="isSubmitting = true">
             @csrf
 
             <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
@@ -340,26 +340,89 @@
                             </div>
                         </section>
 
-                        <section class="bg-white shadow-sm overflow-hidden border border-gray-200 border-l-4 border-l-brand-accent">
+                        <section class="bg-white shadow-sm overflow-hidden border border-gray-200 border-l-4 border-l-brand-accent" x-data="{ open: false, signed: false, signName: '' }">
                             <div class="flex items-center space-x-3 bg-gray-50 px-6 py-4 md:px-8 border-b border-gray-200">
                                 <span class="w-8 h-8 bg-brand-accent/10 text-brand-accent rounded-full flex items-center justify-center font-bold text-sm">3</span>
                                 <h2 class="text-xl font-serif text-gray-900 uppercase tracking-wide">Submission Agreement</h2>
                             </div>
                             <div class="p-6 md:p-8 space-y-6">
-                                <div class="text-sm text-gray-600 space-y-3 mb-6 bg-gray-100 p-4 border border-gray-200">
-                                    <p><strong>1. Confidentiality:</strong> We acknowledge that the manuscript submitted is confidential. We will not reproduce or distribute the manuscript without consent.</p>
-                                    <p><strong>2. Evaluation Purpose:</strong> The manuscript is submitted solely for the purpose of evaluation.</p>
+                                <div class="flex items-center justify-between bg-gray-50 p-6 border border-dashed border-gray-300 rounded-sm">
+                                    <div class="flex items-center space-x-4">
+                                        <template x-if="signed">
+                                            <div class="bg-green-100 p-2 rounded-full text-green-600">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                            </div>
+                                        </template>
+                                        <template x-if="!signed">
+                                            <div class="bg-brand-accent/10 p-2 rounded-full text-brand-accent">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                            </div>
+                                        </template>
+                                        <div>
+                                            <p class="font-bold text-gray-900" x-text="signed ? 'Agreement Signed Successfully' : 'Legal Signature Required'"></p>
+                                            <p class="text-xs text-gray-500" x-text="signed ? 'Signed by ' + signName : 'Please review and sign the terms to proceed'"></p>
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="open = true" class="px-6 py-3 bg-brand-dark text-white text-xs font-bold tracking-widest uppercase hover:bg-gray-800 transition-colors">
+                                        <span x-text="signed ? 'REVIEW SIGNATURE' : 'REVIEW & SIGN AGREEMENT'"></span>
+                                    </button>
                                 </div>
-                                <div>
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" name="agreement_terms" required class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
-                                        <span class="text-sm text-gray-700">I Agree to the Terms and Conditions. <span class="text-red-500">*</span></span>
-                                    </label>
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-gray-700 font-medium mb-1">Electronic Signature (Full Name) <span class="text-red-500">*</span></label>
-                                    <input type="text" name="agreement_name" required placeholder="Your full legal name"
-                                        class="w-full md:w-1/2 bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
+
+                                {{-- Hidden Fields for Submission --}}
+                                <input type="hidden" name="agreement_terms" :value="signed ? '1' : ''" required>
+                                <input type="hidden" name="agreement_name" x-model="signName" required>
+
+                                {{-- Signing Modal --}}
+                                <div x-show="open" 
+                                     x-transition:enter="transition ease-out duration-300"
+                                     x-transition:enter-start="opacity-0"
+                                     x-transition:enter-end="opacity-100"
+                                     x-transition:leave="transition ease-in duration-200"
+                                     x-transition:leave-start="opacity-100"
+                                     x-transition:leave-end="opacity-0"
+                                     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                                     @keydown.escape.window="open = false"
+                                     style="display: none;">
+                                    
+                                    <div class="bg-white max-w-2xl w-full shadow-2xl rounded-sm overflow-hidden" @click.away="open = false">
+                                        <div class="p-8 border-b border-gray-100 flex items-center justify-between">
+                                            <h3 class="text-2xl font-serif font-bold">Submission Agreement</h3>
+                                            <button type="button" @click="open = false" class="text-gray-400 hover:text-gray-900">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="p-8 max-h-[400px] overflow-y-auto bg-gray-50 text-sm text-gray-600 leading-relaxed space-y-4">
+                                            <p class="font-bold text-gray-900">Please read the following terms carefully:</p>
+                                            <p><strong>1. Confidentiality:</strong> The Curated Archive acknowledges that the manuscript submitted is the intellectual property of the Author and is confidential. We will not reproduce, distribute, or disclose the contents to third parties without explicit consent, except for internal evaluation.</p>
+                                            <p><strong>2. Evaluation Purpose:</strong> The manuscript is submitted solely for the purpose of evaluation by our editorial team. This submission does not constitute a guarantee of publication. A separate Publishing Agreement will be issued upon acceptance.</p>
+                                            <p><strong>3. Warranty:</strong> The Author warrants that they are the sole owner of the work and that it does not infringe upon any existing copyright or legal rights of others.</p>
+                                            <p><strong>4. Data Usage:</strong> You consent to the storage of your contact information for the purpose of communicating about this submission.</p>
+                                        </div>
+
+                                        <div class="p-8 space-y-6">
+                                            <div>
+                                                <label class="flex items-center space-x-3 cursor-pointer">
+                                                    <input type="checkbox" x-model="signed" class="w-5 h-5 text-brand-dark border-gray-300 rounded focus:ring-brand-dark cursor-pointer">
+                                                    <span class="text-sm font-medium text-gray-700">I acknowledge and agree to the terms stated above.</span>
+                                                </label>
+                                            </div>
+                                            
+                                            <div x-show="signed" x-transition>
+                                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Electronic Signature (Full Name)</label>
+                                                <input type="text" x-model="signName" placeholder="Type your full legal name" 
+                                                       class="w-full border-b-2 border-gray-200 focus:border-brand-accent py-3 font-serif text-xl outline-none transition-colors">
+                                            </div>
+
+                                            <div class="pt-4 flex items-center justify-end space-x-4">
+                                                <button type="button" @click="open = false" class="text-sm font-bold text-gray-400 hover:text-gray-900 px-6">CANCEL</button>
+                                                <button type="button" @click="if(signed && signName) { open = false } else { alert('Please sign and provide your name') }" 
+                                                        class="bg-brand-accent text-white font-bold text-xs tracking-widest px-8 py-4 uppercase hover:bg-brand-accentHover transition-colors disabled:opacity-50">
+                                                    CONFIRM SIGNATURE
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -442,10 +505,15 @@
                             </div>
 
                             <button x-show="step === maxStep" type="submit"
-                                class="w-full bg-brand-accent text-white py-4 font-bold tracking-widest hover:bg-brand-accentHover transition-colors flex justify-center items-center group rounded-sm"
+                                :disabled="isSubmitting"
+                                class="w-full bg-brand-accent text-white py-4 font-bold tracking-widest hover:bg-brand-accentHover transition-colors flex justify-center items-center group rounded-sm disabled:opacity-70 disabled:cursor-not-allowed"
                                 style="display: none;">
-                                SUBMIT PROSPECT
-                                <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform"
+                                <svg x-show="isSubmitting" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" style="display: none;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span x-text="isSubmitting ? 'PROCESSING...' : 'SUBMIT PROSPECT'">SUBMIT PROSPECT</span>
+                                <svg x-show="!isSubmitting" class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -505,6 +573,7 @@
              Alpine.data('enquiryForm', () => ({
                 step: 1, 
                 maxStep: 2,
+                isSubmitting: false,
                 words: {{ (int)old('number_of_words', 0) }},
                 services: @json(old('services', ['editing'])),
                 allRates: @json($rates),
