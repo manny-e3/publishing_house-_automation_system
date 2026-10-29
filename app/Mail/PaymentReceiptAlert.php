@@ -3,16 +3,14 @@
 namespace App\Mail;
 
 use App\Models\Invoice;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class PaymentReceiptAlert extends Mailable implements ShouldQueue
+class PaymentReceiptAlert extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
 
     public $invoice;
 

@@ -22,6 +22,27 @@
                     <p class="text-soft fs-15px">Access your curated collections and essays.</p>
                 </div>
             </div>
+
+            @if(session('success'))
+                <div class="alert alert-success alert-icon alert-dismissible bg-success-dim border-0 mb-4 mt-3">
+                    <em class="icon ni ni-check-circle"></em> {{ session('success') }}
+                    <button class="close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @if(session('status'))
+                <div class="alert alert-success alert-icon alert-dismissible bg-success-dim border-0 mb-4 mt-3">
+                    <em class="icon ni ni-check-circle"></em> {{ session('status') }}
+                    <button class="close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-icon alert-dismissible bg-danger-dim border-0 mb-4 mt-3">
+                    <em class="icon ni ni-cross-circle"></em> {{ session('error') }}
+                    <button class="close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
             
             <form action="{{ route('login.post') }}" method="POST" class="mt-5">
                 @csrf

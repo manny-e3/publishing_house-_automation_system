@@ -32,11 +32,42 @@
                     <p class="text-soft fs-15px">Enter your new credentials below to secure your archive access.</p>
                 </div>
             </div>
+
+            @if(session('success'))
+                <div class="alert alert-success alert-icon alert-dismissible bg-success-dim border-0 mb-4 mt-3">
+                    <em class="icon ni ni-check-circle"></em> {{ session('success') }}
+                    <button class="close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-icon alert-dismissible bg-danger-dim border-0 mb-4 mt-3">
+                    <em class="icon ni ni-cross-circle"></em> {{ session('error') }}
+                    <button class="close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @if($errors->has('token'))
+                <div class="alert alert-danger alert-icon alert-dismissible bg-danger-dim border-0 mb-4 mt-3">
+                    <em class="icon ni ni-cross-circle"></em> {{ $errors->first('token') }}
+                    <button class="close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
             
             <form action="{{ route('password.update') }}" method="POST" class="mt-4">
                 @csrf
-                <input type="hidden" name="token" value="{{ $request->route('token') }}">
-                <input type="hidden" name="email" value="{{ $request->email }}">
+                <input type="hidden" name="token" value="{{ $token ?? $request->route('token') }}">
+
+                <div class="form-group mb-4">
+                    <label class="form-label">Email Address</label>
+                    <div class="form-control-wrap">
+                        <div class="form-icon form-icon-right">
+                            <em class="icon ni ni-mail"></em>
+                        </div>
+                        <input type="email" name="email" class="form-control form-control-lg" placeholder="Enter your email" value="{{ old('email', $email ?? $request->email ?? request('email')) }}" required>
+                    </div>
+                    @error('email') <span class="text-danger mt-1 d-block fs-12px">{{ $message }}</span> @enderror
+                </div>
 
                 <div class="form-group mb-4">
                     <label class="form-label">New Password</label>

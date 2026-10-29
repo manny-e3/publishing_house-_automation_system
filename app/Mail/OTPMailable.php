@@ -2,14 +2,12 @@
 
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class OTPMailable extends Mailable implements ShouldQueue
+class OTPMailable extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
 
     public $otp;
 

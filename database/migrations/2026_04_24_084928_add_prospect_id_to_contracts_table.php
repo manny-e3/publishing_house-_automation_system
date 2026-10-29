@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('contracts', function (Blueprint $table) {
-            $table->foreignId('project_id')->nullable()->change();
+            if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {
+                $table->foreignId('project_id')->nullable()->change();
+            }
             $table->foreignId('prospect_id')->nullable()->constrained()->onDelete('cascade')->after('id');
             $table->string('contract_type')->default('publishing')->after('prospect_id'); // submission, publishing
         });

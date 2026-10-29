@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use App\Mail\ResetPasswordMail;
 use App\Services\AuthService;
 
 class AuthController extends Controller
@@ -101,12 +106,40 @@ class AuthController extends Controller
     public function sendResetLink(Request $request)
     {
         $request->validate(['email' => 'required|email']);
-        return back()->with('success', 'A secure recovery link has been sent to your email.');
+
+        $user = User::where('email', trim($request->email))->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'We could not find an account associated with this email address.'])->withInput();
+        }
+
+        try {
+            $token = Password::broker()->createToken($user);
+            $resetUrl = route('password.reset', [
+                'token' => $token,
+                'email' => $user->email,
+            ]);
+
+            Mail::to($user->email)->send(new ResetPasswordMail($user, $resetUrl));
+
+            return back()->with('success', 'A secure password recovery link has been sent to your email.');
+        } catch (\Throwable $e) {
+            Log::error('Password reset email failed: ' . $e->getMessage(), [
+                'email' => $user->email,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()->with('error', 'Unable to send recovery email. Please check your mail configuration or try again later.')->withInput();
+        }
     }
 
     public function showResetPassword(Request $request, $token)
     {
-        return view('auth.reset-password', ['request' => $request]);
+        return view('auth.reset-password', [
+            'request' => $request,
+            'token' => $token,
+            'email' => $request->query('email', old('email', '')),
+        ]);
     }
 
     public function resetPassword(Request $request)
@@ -117,10 +150,12 @@ class AuthController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
         
-        if ($this->authService->resetPassword($request->email, $request->password)) {
-            return redirect()->route('login')->with('success', 'Your password has been reset successfully.');
+        $result = $this->authService->resetPasswordWithToken($request->email, $request->password, $request->token);
+
+        if ($result['status']) {
+            return redirect()->route('login')->with('success', $result['message']);
         }
 
-        return back()->withErrors(['email' => 'User not found.']);
+        return back()->withErrors(['email' => $result['message']])->withInput($request->only('email'));
     }
 }

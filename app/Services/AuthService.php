@@ -7,6 +7,7 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use App\Mail\OTPMailable;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -112,6 +113,28 @@ class AuthService
             return true;
         }
         return false;
+    }
+
+    /**
+     * Reset user password with token validation.
+     */
+    public function resetPasswordWithToken(string $email, string $password, string $token): array
+    {
+        $user = User::where('email', trim($email))->first();
+        if (!$user) {
+            return ['status' => false, 'message' => 'We could not find an account associated with this email address.'];
+        }
+
+        if (!Password::broker()->tokenExists($user, $token)) {
+            return ['status' => false, 'message' => 'This password reset link is invalid or has expired. Please request a new link.'];
+        }
+
+        $user->password = Hash::make($password);
+        $user->save();
+
+        Password::broker()->deleteToken($user);
+
+        return ['status' => true, 'message' => 'Your password has been reset successfully. Please sign in with your new password.'];
     }
 
     /**

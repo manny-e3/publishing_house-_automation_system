@@ -3,8 +3,6 @@
 namespace App\Mail;
 
 use App\Models\Invoice;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -12,9 +10,9 @@ use Illuminate\Queue\SerializesModels;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Mail\Mailables\Attachment;
 
-class BalancePaymentSuccessfulMail extends Mailable implements ShouldQueue
+class BalancePaymentSuccessfulMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
 
     public $invoice;
     public $prospect;

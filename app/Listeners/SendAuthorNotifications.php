@@ -17,8 +17,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Mail\AuthorAccountCreated;
 use App\Mail\PaymentSuccessfulMail;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
