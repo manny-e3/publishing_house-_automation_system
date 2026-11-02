@@ -22,6 +22,10 @@
                             <span class="text-white font-bold" style="font-size:1.25rem; font-family: serif;">Curated Archive</span>
                         </a>
                     </div>
+                    <div class="nk-menu-trigger ms-auto me-n2">
+                        <a href="#" class="nk-nav-toggle nk-quick-nav-icon d-xl-none" data-target="sidebarMenu"><em class="icon ni ni-arrow-left"></em></a>
+                        <a href="#" class="nk-nav-compact nk-quick-nav-icon d-none d-xl-inline-flex" data-target="sidebarMenu"><em class="icon ni ni-menu"></em></a>
+                    </div>
                 </div>
                 <div class="nk-sidebar-element nk-sidebar-body">
                     <div class="nk-sidebar-content">
@@ -36,26 +40,82 @@
                                         <span class="nk-menu-text">Dashboard</span>
                                     </a>
                                 </li>
+
+                                <!-- 1. Publishing Operations -->
                                 <li class="nk-menu-heading">
-                                    <h6 class="overline-title text-primary-alt">Modules</h6>
+                                    <h6 class="overline-title text-primary-alt">Publishing Operations</h6>
                                 </li>
-                                @hasanyrole('admin|acquisitions')
+
+                                @hasanyrole('admin|acquisition_admin|acquisitions|legal')
+                                <li class="nk-menu-item has-sub">
+                                    <a href="#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-file-check"></em></span>
+                                        <span class="nk-menu-text">Acquisitions & Intake</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="{{ route('dashboard.acquisition.index') }}" class="nk-menu-link"><span class="nk-menu-text">Vetting Queue & Triage</span></a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="{{ route('admin.prospects.index') }}" class="nk-menu-link"><span class="nk-menu-text">Prospect Submissions</span></a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="{{ route('admin.contracts.index') }}" class="nk-menu-link"><span class="nk-menu-text">Legal & Contracts</span></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                @endrole
+
+                                @hasanyrole('admin|editorial')
+                                <li class="nk-menu-item has-sub">
+                                    <a href="#" class="nk-menu-link nk-menu-toggle">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-edit-alt"></em></span>
+                                        <span class="nk-menu-text">Editorial & Proofing</span>
+                                    </a>
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="{{ route('dashboard.editorial.index') }}" class="nk-menu-link"><span class="nk-menu-text">7-Stage Editorial Board</span></a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="{{ route('admin.projects.index') }}" class="nk-menu-link"><span class="nk-menu-text">Active Projects</span></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                @endrole
+
+                                @hasanyrole('admin|design')
                                 <li class="nk-menu-item">
-                                    <a href="{{ route('admin.prospects.index') }}" class="nk-menu-link">
-                                        <span class="nk-menu-icon"><em class="icon ni ni-inbox"></em></span>
-                                        <span class="nk-menu-text">Prospect Tracker</span>
-                                        <span class="nk-menu-badge bg-danger">New</span>
+                                    <a href="{{ route('dashboard.design.index') }}" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-color-palette"></em></span>
+                                        <span class="nk-menu-text">Design & Typesetting</span>
                                     </a>
                                 </li>
                                 @endrole
 
+                                @hasanyrole('admin|print_distribution')
+                                <li class="nk-menu-item">
+                                    <a href="{{ route('dashboard.distribution.index') }}" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-truck"></em></span>
+                                        <span class="nk-menu-text">Print & Distribution</span>
+                                    </a>
+                                </li>
+                                @endrole
+
+                                <!-- 2. Commercial & Growth -->
+                                <li class="nk-menu-heading">
+                                    <h6 class="overline-title text-primary-alt">Commercial & Growth</h6>
+                                </li>
+
                                 @hasanyrole('admin|finance')
                                 <li class="nk-menu-item has-sub">
                                     <a href="#" class="nk-menu-link nk-menu-toggle">
-                                        <span class="nk-menu-icon"><em class="icon ni ni-file-docs"></em></span>
-                                        <span class="nk-menu-text">Billing & Invoices</span>
+                                        <span class="nk-menu-icon"><em class="icon ni ni-money"></em></span>
+                                        <span class="nk-menu-text">Finance & Billing</span>
                                     </a>
                                     <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="{{ route('dashboard.finance.index') }}" class="nk-menu-link"><span class="nk-menu-text">Revenue & Settlements</span></a>
+                                        </li>
                                         <li class="nk-menu-item">
                                             <a href="{{ route('admin.invoices.index') }}" class="nk-menu-link"><span class="nk-menu-text">Invoices</span></a>
                                         </li>
@@ -69,28 +129,35 @@
                                 </li>
                                 @endrole
 
-                                @hasanyrole('admin|editorial')
+                                @hasanyrole('admin|marketing')
                                 <li class="nk-menu-item">
-                                    <a href="{{ route('admin.projects.index') }}" class="nk-menu-link">
-                                        <span class="nk-menu-icon"><em class="icon ni ni-briefcase"></em></span>
-                                        <span class="nk-menu-text">Active Projects</span>
+                                    <a href="{{ route('dashboard.marketing.index') }}" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-growth"></em></span>
+                                        <span class="nk-menu-text">Marketing & ROI</span>
                                     </a>
                                 </li>
                                 @endrole
 
-                                @hasanyrole('admin|acquisitions|legal')
+                                <!-- 3. Administration -->
+                                @hasanyrole('admin|it')
+                                <li class="nk-menu-heading">
+                                    <h6 class="overline-title text-primary-alt">Administration</h6>
+                                </li>
                                 <li class="nk-menu-item">
-                                    <a href="{{ route('admin.contracts.index') }}" class="nk-menu-link">
-                                        <span class="nk-menu-icon"><em class="icon ni ni-file-text"></em></span>
-                                        <span class="nk-menu-text">Legal & Contracts</span>
+                                    <a href="{{ route('admin.audit_logs.index') }}" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-activity-round"></em></span>
+                                        <span class="nk-menu-text">Audit & Activity Logs</span>
+                                    </a>
+                                </li>
+                                <li class="nk-menu-item">
+                                    <a href="{{ route('dashboard.it.index') }}" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-server"></em></span>
+                                        <span class="nk-menu-text">IT Operations & Flags</span>
                                     </a>
                                 </li>
                                 @endrole
 
                                 @hasrole('admin')
-                                <li class="nk-menu-heading">
-                                    <h6 class="overline-title text-soft">Access Control</h6>
-                                </li>
                                 <li class="nk-menu-item has-sub">
                                     <a href="#" class="nk-menu-link nk-menu-toggle">
                                         <span class="nk-menu-icon"><em class="icon ni ni-users"></em></span>
@@ -105,23 +172,15 @@
                                         </li>
                                     </ul>
                                 </li>
-                                @endrole
 
-                                @hasanyrole('admin|finance')
-                                <li class="nk-menu-heading">
-                                    <h6 class="overline-title text-soft">Configuration</h6>
-                                </li>
-                                <li class="nk-menu-item">
-                                    
-                                </li>
                                 <li class="nk-menu-item has-sub">
                                     <a href="#" class="nk-menu-link nk-menu-toggle">
-                                        <span class="nk-menu-icon"><em class="icon ni ni-config"></em> <em class="icon ni ni-setting-alt"></em></span>
+                                        <span class="nk-menu-icon"><em class="icon ni ni-setting-alt"></em></span>
                                         <span class="nk-menu-text">System Settings</span>
                                     </a>
                                     <ul class="nk-menu-sub">
                                         <li class="nk-menu-item">
-                                            <a href="{{ route('admin.settings.gateways') }}" class="nk-menu-link"><span class="nk-menu-text">Payment Settings</span></a>
+                                            <a href="{{ route('admin.settings.gateways') }}" class="nk-menu-link"><span class="nk-menu-text">Payment Gateways</span></a>
                                         </li>
                                         <li class="nk-menu-item">
                                             <a href="{{ route('admin.settings.pricing') }}" class="nk-menu-link"><span class="nk-menu-text">Pricing Matrix</span></a>
@@ -151,6 +210,9 @@
                 <div class="nk-header nk-header-fixed is-light">
                     <div class="container-fluid">
                         <div class="nk-header-wrap">
+                            <div class="nk-menu-trigger d-xl-none ms-n1">
+                                <a href="#" class="nk-nav-toggle nk-quick-nav-icon" data-target="sidebarMenu"><em class="icon ni ni-menu"></em></a>
+                            </div>
                             <div class="nk-header-brand d-xl-none">
                                 <a href="{{ route('admin.dashboard') }}" class="logo-link">
                                     <span class="font-bold text-lg">Curated Archive</span>
@@ -170,6 +232,31 @@
                                                 </div>
                                             </div>
                                         </a>
+                                        <div class="dropdown-menu dropdown-menu-md dropdown-menu-end">
+                                            <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
+                                                <div class="user-card">
+                                                    <div class="user-avatar">
+                                                        <span>{{ substr(Auth::user()->name ?? 'AD', 0, 2) }}</span>
+                                                    </div>
+                                                    <div class="user-info">
+                                                        <span class="lead-text">{{ Auth::user()->name }}</span>
+                                                        <span class="sub-text">{{ Auth::user()->email }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li>
+                                                        <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                                                            @csrf
+                                                            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-danger">
+                                                                <em class="icon ni ni-signout"></em><span>Sign Out</span>
+                                                            </a>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </li>
                                 </ul>
                             </div>

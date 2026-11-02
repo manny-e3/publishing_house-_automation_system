@@ -91,6 +91,13 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        $user = Auth::user();
+        if ($user) {
+            \App\Models\AuditLog::record('auth_logout', $user, [
+                'email' => $user->email,
+            ], $user->id);
+        }
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

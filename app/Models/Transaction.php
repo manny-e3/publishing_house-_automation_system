@@ -27,4 +27,15 @@ class Transaction extends Model
     {
         return $this->belongsTo(Invoice::class);
     }
+
+    /**
+     * Get the currency symbol for this transaction ($ or ₦).
+     */
+    public function getCurrencySymbolAttribute(): string
+    {
+        if ($this->gateway_slug === 'stripe' || strtoupper($this->currency ?? '') === 'USD') {
+            return '$';
+        }
+        return '₦';
+    }
 }

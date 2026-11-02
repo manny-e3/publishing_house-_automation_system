@@ -23,7 +23,7 @@
             <div class="details">
                 <p><strong>Invoice Number:</strong> {{ $invoice->invoice_number }}</p>
                 <p><strong>Reference:</strong> {{ $invoice->payment_reference }}</p>
-                <p><strong>Amount Paid:</strong> ₦{{ number_format($invoice->amount, 2) }}</p>
+                <p><strong>Amount Paid:</strong> {{ $invoice->currency_symbol }}{{ number_format($invoice->is_installment ? $invoice->total_paid : $invoice->amount, 2) }} ({{ $invoice->currency }})</p>
                 <p><strong>Author:</strong> {{ $invoice->prospect->name }}</p>
                 <p><strong>Book Title:</strong> {{ $invoice->prospect->book_title }}</p>
                 <p><strong>Paid On:</strong> {{ $invoice->paid_at->format('M d, Y H:i') }}</p>

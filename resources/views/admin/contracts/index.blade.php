@@ -1,76 +1,114 @@
 @extends('layouts.admin')
 
-@section('title', 'Contract Management')
+@section('title', 'Legal & Contract Management')
 
 @section('content')
-<div class="px-4 sm:px-6 lg:px-8">
-    <div class="sm:flex sm:items-center">
-        <div class="sm:flex-auto">
-            <h1 class="text-2xl font-semibold text-gray-900">Legal & Contracts</h1>
-            <p class="mt-2 text-sm text-gray-700">A consolidated list of all signed agreements, including submission terms and publishing contracts.</p>
+<div class="nk-content-inner">
+    <div class="nk-content-body">
+        <div class="nk-block-head nk-block-head-sm">
+            <div class="nk-block-between">
+                <div class="nk-block-head-content">
+                    <h3 class="nk-block-title page-title">Legal & Contracts</h3>
+                    <div class="nk-block-des text-soft">
+                        <p>A consolidated registry of all executed submission agreements, author terms, and publishing contracts.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="mt-8 flex flex-col">
-        <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-300">
-                        <thead class="bg-gray-50">
+        @if(session('success'))
+            <div class="alert alert-success alert-icon mb-4">
+                <em class="icon ni ni-check-circle"></em> {{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger alert-icon mb-4">
+                <em class="icon ni ni-alert-circle"></em> {{ session('error') }}
+            </div>
+        @endif
+
+        <div class="card card-bordered">
+            <div class="card-inner">
+                <div class="card-title-group mb-3">
+                    <div class="card-title">
+                        <h5 class="title">All Executed Agreements</h5>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
                             <tr>
-                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Type</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Author / Entity</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Project / Book</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Signed Date</th>
-                                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 text-right">
-                                    <span class="sr-only">Actions</span>
-                                </th>
+                                <th>Agreement Type</th>
+                                <th>Author / Signatory</th>
+                                <th>Project / Book Title</th>
+                                <th>Status</th>
+                                <th>Signed Date</th>
+                                <th class="text-end">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white">
+                        <tbody>
                             @forelse($contracts as $contract)
                             <tr>
-                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $contract->contract_type === 'publishing' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800' }}">
-                                        {{ ucfirst($contract->contract_type) }}
-                                    </span>
+                                <td>
+                                    @if($contract->contract_type === 'publishing')
+                                        <span class="badge bg-primary-dim text-primary">
+                                            <em class="icon ni ni-file-docs"></em> Publishing Contract
+                                        </span>
+                                    @else
+                                        <span class="badge bg-info-dim text-info">
+                                            <em class="icon ni ni-file-text"></em> Submission Terms
+                                        </span>
+                                    @endif
                                 </td>
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {{ $contract->prospect->name ?? 'N/A' }}
+                                <td>
+                                    <strong>{{ $contract->prospect->name ?? 'N/A' }}</strong><br>
+                                    <small class="text-muted">{{ $contract->prospect->email ?? '' }}</small>
                                 </td>
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {{ $contract->prospect->book_title ?? $contract->project->prospect->book_title ?? 'N/A' }}
+                                <td>
+                                    <strong>{{ $contract->prospect->book_title ?? $contract->project->prospect->book_title ?? 'Untitled Manuscript' }}</strong>
                                 </td>
-                                <td class="whitespace-nowrap px-3 py-4 text-sm">
-                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $contract->status === 'signed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                        {{ ucfirst($contract->status) }}
-                                    </span>
+                                <td>
+                                    @if($contract->status === 'signed')
+                                        <span class="badge bg-success-dim text-success">
+                                            <em class="icon ni ni-check-circle"></em> Signed
+                                        </span>
+                                    @else
+                                        <span class="badge bg-warning-dim text-warning">
+                                            <em class="icon ni ni-clock"></em> Pending
+                                        </span>
+                                    @endif
                                 </td>
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {{ $contract->signed_at ? $contract->signed_at->format('M d, Y H:i') : 'Pending' }}
+                                <td>
+                                    @if($contract->signed_at)
+                                        <span class="fw-bold">{{ $contract->signed_at->format('M d, Y') }}</span><br>
+                                        <small class="text-muted">{{ $contract->signed_at->format('H:i') }}</small>
+                                    @else
+                                        <span class="text-muted italic">Pending Execution</span>
+                                    @endif
                                 </td>
-                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                    <a href="{{ route('admin.contracts.download', $contract) }}" class="text-brand-accent hover:text-brand-accentHover flex items-center justify-end space-x-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                        <span>PDF</span>
+                                <td class="text-end">
+                                    <a href="{{ route('admin.contracts.download', $contract) }}" class="btn btn-sm btn-outline-primary">
+                                        <em class="icon ni ni-download"></em> Download PDF
                                     </a>
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="6" class="py-12 text-center text-sm text-gray-500 italic">No contracts found in the system.</td>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    <em>No contracts or legal agreements found in the system.</em>
+                                </td>
                             </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
+
+                <div class="mt-3">
+                    {{ $contracts->links() }}
+                </div>
             </div>
         </div>
-    </div>
-    
-    <div class="mt-4">
-        {{ $contracts->links() }}
     </div>
 </div>
 @endsection

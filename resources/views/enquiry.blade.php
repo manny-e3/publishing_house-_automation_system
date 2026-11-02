@@ -4,12 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Publishing Enquiry - The Curated Archive</title>
+    <title>Publishing Enquiry & Triage - The Curated Archive</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -33,50 +31,117 @@
     </script>
 </head>
 
-<body
-    class="bg-brand-bg font-sans text-gray-800 antialiased selection:bg-brand-accent selection:text-white flex flex-col min-h-screen">
+<body class="bg-brand-bg font-sans text-gray-800 antialiased selection:bg-brand-accent selection:text-white flex flex-col min-h-screen">
 
     <!-- Header -->
-    <header class="bg-brand-bg border-b border-gray-200">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
-                <div class="flex-shrink-0 flex items-center">
-                    <a href="#" class="font-serif italic font-bold text-2xl text-gray-900 tracking-tight">The Curated
-                        Archive</a>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ route('welcome') }}" class="font-serif italic font-bold text-2xl text-gray-900 tracking-tight">The Curated Archive</a>
+                    <span class="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-brand-accent/10 text-brand-accent">
+                        Osisi Hybrid & Traditional
+                    </span>
                 </div>
-                <nav class="hidden md:flex space-x-8">
-                    <a href="#" class="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">Catalogue</a>
-                    <a href="#" class="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">Authors</a>
-                    <a href="#" class="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">Philosophy</a>
-                    <a href="#"
-                        class="text-brand-accent px-3 py-2 text-sm font-medium border-b-2 border-brand-accent">Services</a>
-                </nav>
+                
                 <div class="flex items-center space-x-4">
-                    <a href="#"
-                        class="bg-brand-dark text-white px-5 py-2 text-sm font-medium hover:bg-gray-800 transition-colors">Start
-                        Enquiry</a>
+                    <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900">Sign In</a>
+                    <a href="{{ route('welcome') }}" class="bg-brand-dark text-white px-4 py-2 text-xs font-bold tracking-wider uppercase hover:bg-gray-800 transition-colors">
+                        Catalog
+                    </a>
                 </div>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="mb-10">
-            <h1 class="text-4xl md:text-5xl font-serif text-gray-900 mb-4">Publishing Enquiry</h1>
-            <p class="text-gray-600 max-w-3xl leading-relaxed">Begin the journey of bringing your manuscript to the
-                world. Provide us with the foundational details of your work, and our editorial team will curate a
-                bespoke strategy.</p>
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" x-data="triageForm()" x-cloak>
+        
+        <div class="mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl md:text-5xl font-serif text-gray-900 mb-2">Publishing Submission & Triage</h1>
+                    <p class="text-gray-600 max-w-2xl text-sm md:text-base leading-relaxed">
+                        Submit your manuscript for automated model evaluation. Our triage engine dynamically evaluates your project for either Traditional Acquisition review or the high-velocity Osisi Hybrid distribution pipeline.
+                    </p>
+                </div>
+
+                <!-- Currency Localisation Control Toggle -->
+                <div class="bg-white p-2 rounded-lg border border-gray-200 shadow-sm self-start md:self-auto flex items-center space-x-2">
+                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider pl-2">Currency:</span>
+                    <button type="button" @click="setCurrency('USD')" 
+                            :class="currency === 'USD' ? 'bg-brand-dark text-white font-bold' : 'text-gray-600 hover:bg-gray-100'"
+                            class="px-3 py-1.5 rounded-md text-xs transition-colors flex items-center space-x-1.5">
+                        <span>🌐 International ($ USD)</span>
+                    </button>
+                    <button type="button" @click="setCurrency('NGN')" 
+                            :class="currency === 'NGN' ? 'bg-brand-accent text-white font-bold' : 'text-gray-600 hover:bg-gray-100'"
+                            class="px-3 py-1.5 rounded-md text-xs transition-colors flex items-center space-x-1.5">
+                        <span>🌍 West Africa (₦ NGN)</span>
+                    </button>
+                </div>
+            </div>
         </div>
 
         @if (session('success'))
-        <div class="mb-8 bg-green-50 text-green-800 p-4 rounded-md border border-green-200">
-            <p class="font-medium text-sm">{{ session('success') }}</p>
+        <div class="mb-10 bg-white border-2 border-emerald-500 rounded-lg p-6 md:p-8 shadow-lg">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-gray-100">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
+                        ✓
+                    </div>
+                    <div>
+                        <span class="text-xs uppercase tracking-widest font-bold text-emerald-700">Manuscript Ingested Successfully</span>
+                        <h3 class="text-xl md:text-2xl font-serif font-bold text-gray-900">{{ session('submitted_title', 'Your Manuscript Submission') }}</h3>
+                    </div>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 px-4 py-2 rounded text-right">
+                    <span class="text-[10px] uppercase font-bold text-gray-400 block tracking-wider">Reference Tracker</span>
+                    <span class="font-mono font-bold text-base text-gray-800">#TCA-{{ str_pad(session('submitted_prospect_id', rand(100, 999)), 5, '0', STR_PAD_LEFT) }}</span>
+                </div>
+            </div>
+
+            <div class="pt-5 space-y-4">
+                <p class="text-sm text-gray-700 leading-relaxed">
+                    {{ session('success') }}
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div class="bg-gray-50 p-4 rounded border border-gray-100 text-xs space-y-1">
+                        <span class="font-bold text-gray-900 block">Classified Pathway:</span>
+                        <span class="text-gray-600">
+                            @if(session('submitted_model') === 'traditional')
+                                🟢 <strong>Traditional Acquisition Board</strong> (Full advance & zero-cost author production review)
+                            @else
+                                🟡 <strong>Osisi Hybrid Model</strong> (High-velocity 80% royalty digital & physical distribution)
+                            @endif
+                        </span>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded border border-gray-100 text-xs space-y-1">
+                        <span class="font-bold text-gray-900 block">Electronic Terms Executed:</span>
+                        <span class="text-gray-600">
+                            Digital submission agreement automatically signed and counter-signed under IP protection.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <a href="{{ route('login') }}" class="bg-brand-dark text-white px-5 py-2.5 rounded text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition">
+                        Author Sign In & Portal
+                    </a>
+                    <a href="{{ route('enquiry.index') }}" class="border border-gray-300 text-gray-700 px-5 py-2.5 rounded text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition">
+                        Submit Another Manuscript
+                    </a>
+                </div>
+            </div>
         </div>
         @endif
+
         @if ($errors->any())
-        <div class="mb-8 bg-red-50 text-red-800 p-4 rounded-md border border-red-200">
-            <ul class="list-disc pl-5 text-sm font-medium">
+        <div class="mb-8 bg-red-50 text-red-900 p-5 rounded-md border border-red-200 shadow-sm">
+            <h4 class="font-bold text-sm mb-2">Please correct the following errors:</h4>
+            <ul class="list-disc pl-5 text-sm space-y-1">
                 @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
                 @endforeach
@@ -84,461 +149,444 @@
         </div>
         @endif
 
-        <form action="{{ route('enquiry.store') }}" method="POST" enctype="multipart/form-data" x-data="enquiryForm" @submit="isSubmitting = true">
+        <form action="{{ route('enquiry.store') }}" method="POST" enctype="multipart/form-data" @submit="isSubmitting = true">
             @csrf
+            
+            <input type="hidden" name="marketing_source" value="{{ $utmSource ?? request('utm_source', 'direct') }}">
+            <input type="hidden" name="currency" :value="currency">
 
-            <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+            <div class="flex flex-col lg:flex-row gap-8 lg:gap-10">
 
-                <!-- Left Column (Form Fields) -->
-                <div class="w-full lg:w-2/3 space-y-8">
+                <!-- Left Column: Interactive Form -->
+                <div class="w-full lg:w-7/12 space-y-8">
 
-                    <!-- Progress Bar -->
-                    <div class="bg-white p-4 shadow-sm border border-gray-200 sticky top-0 z-10 hidden md:block">
-                        <div class="flex items-center justify-between">
-                            <div class="w-1/2 text-center border-r"
-                                :class="{'text-brand-accent font-bold': step === 1, 'text-green-600': step > 1 }">1.
-                                Project Details</div>
-                            <div class="w-1/2 text-center"
-                                :class="{'text-brand-accent font-bold': step === 2, 'text-gray-400': step < 2}">2.
-                                Uploads & Verification</div>
+                    <!-- Section 1: Author Demographics & Triage Parameters -->
+                    <section class="bg-white p-6 md:p-8 shadow-sm border border-gray-200 rounded-sm">
+                        <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-100">
+                            <span class="w-7 h-7 bg-brand-dark text-white rounded-full flex items-center justify-center font-bold text-xs">1</span>
+                            <h2 class="text-lg font-serif font-bold text-gray-900 uppercase tracking-wide">Author Demographics</h2>
                         </div>
-                        <div class="w-full bg-gray-200 h-1.5 mt-4 rounded-full overflow-hidden">
-                            <div class="bg-brand-accent h-1.5 transition-all duration-300"
-                                :style="'width: ' + ((step/maxStep)*100) + '%'"></div>
+
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Full Legal Name <span class="text-red-500">*</span></label>
+                                <input type="text" name="name" required value="{{ old('name') }}" placeholder="e.g., Dr. Amina Yusuf"
+                                       x-model="authorName"
+                                       class="w-full bg-gray-50 border border-gray-200 rounded py-2.5 px-3.5 text-sm text-gray-900 focus:bg-white focus:border-brand-dark focus:ring-0 transition">
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Email Address <span class="text-red-500">*</span></label>
+                                    <input type="email" name="email" required value="{{ old('email') }}" placeholder="author@domain.com"
+                                           class="w-full bg-gray-50 border border-gray-200 rounded py-2.5 px-3.5 text-sm text-gray-900 focus:bg-white focus:border-brand-dark focus:ring-0 transition">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">WhatsApp / Phone <span class="text-red-500">*</span></label>
+                                    <input type="tel" name="phone_number" required value="{{ old('phone_number') }}" placeholder="+234 800 000 0000"
+                                           class="w-full bg-gray-50 border border-gray-200 rounded py-2.5 px-3.5 text-sm text-gray-900 focus:bg-white focus:border-brand-dark focus:ring-0 transition">
+                                </div>
+                            </div>
+
+                            <!-- Triage Input: Author Age -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">
+                                        Author Age <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="number" name="author_age" min="15" max="110" required 
+                                           x-model.number="authorAge"
+                                           placeholder="e.g. 52"
+                                           class="w-full bg-gray-50 border border-gray-200 rounded py-2.5 px-3.5 text-sm text-gray-900 focus:bg-white focus:border-brand-dark focus:ring-0 transition">
+                                    <span class="text-[11px] text-gray-400 mt-1 block">Required for publishing pathway evaluation</span>
+                                </div>
+
+                                <div class="space-y-3 pt-1">
+                                    <label class="flex items-start space-x-2.5 cursor-pointer">
+                                        <input type="checkbox" name="has_social_presence" value="1" 
+                                               x-model="hasSocialPresence"
+                                               class="w-4 h-4 mt-0.5 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
+                                        <div class="text-xs text-gray-700">
+                                            <span class="font-semibold block">Social Media Presence</span>
+                                            <span class="text-gray-500">I have an engaged digital follower audience</span>
+                                        </div>
+                                    </label>
+
+                                    <label class="flex items-start space-x-2.5 cursor-pointer">
+                                        <input type="checkbox" name="is_established_author" value="1" 
+                                               x-model="isEstablishedAuthor"
+                                               class="w-4 h-4 mt-0.5 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
+                                        <div class="text-xs text-gray-700">
+                                            <span class="font-semibold block">Established Author</span>
+                                            <span class="text-gray-500">I have previously published books or catalog</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </section>
 
-                    <div class="md:hidden mb-4 text-xs font-bold text-gray-500 uppercase tracking-widest">
-                        Step <span x-text="step"></span> of <span x-text="maxStep"></span>
-                    </div>
+                    <!-- Section 2: Book Details & Genre Rate Metric -->
+                    <section class="bg-white p-6 md:p-8 shadow-sm border border-gray-200 rounded-sm">
+                        <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-100">
+                            <span class="w-7 h-7 bg-brand-dark text-white rounded-full flex items-center justify-center font-bold text-xs">2</span>
+                            <h2 class="text-lg font-serif font-bold text-gray-900 uppercase tracking-wide">Manuscript Dimensions</h2>
+                        </div>
 
-                    <!-- STEP 1: PROJECT DETAILS -->
-                    <div id="step-container-1" x-show="step === 1" x-transition.opacity.duration.300ms
-                        class="step-container space-y-8">
-                        <section class="bg-white p-6 md:p-8 shadow-sm border border-gray-100">
-                            <div class="flex items-center space-x-3 mb-6">
-                                <h2 class="text-xl font-serif text-gray-900 uppercase tracking-wide">Author Information
-                                </h2>
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Working Book Title <span class="text-red-500">*</span></label>
+                                <input type="text" name="book_title" required value="{{ old('book_title') }}" placeholder="e.g. Chronicles of the Palm Groves"
+                                       class="w-full bg-gray-50 border border-gray-200 rounded py-2.5 px-3.5 text-sm text-gray-900 focus:bg-white focus:border-brand-dark focus:ring-0 transition">
                             </div>
-                            <div class="space-y-5">
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm text-gray-700 font-medium mb-1">Full Name <span class="text-red-500">*</span></label>
-                                    <input type="text" name="name" required value="{{ old('name') }}" placeholder="Enter your full name"
-                                        class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div>
-                                        <label class="block text-sm text-gray-700 font-medium mb-1">Phone number <span class="text-red-500">*</span></label>
-                                        <input type="tel" name="phone_number" required value="{{ old('phone_number') }}" placeholder="Enter your phone number"
-                                            class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm text-gray-700 font-medium mb-1">Email <span class="text-red-500">*</span></label>
-                                        <input type="email" name="email" required value="{{ old('email') }}" placeholder="Enter your email address"
-                                            class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-
-                         <section class="bg-white p-6 md:p-8 shadow-sm border border-gray-100 border-l-4 border-l-brand-accent">
-                             <div class="flex items-center space-x-3 mb-6">
-                                 <span class="w-8 h-8 bg-brand-accent/10 text-brand-accent rounded-full flex items-center justify-center font-bold text-sm">1</span>
-                                 <h2 class="text-xl font-serif text-gray-900 uppercase tracking-wide">About The Book</h2>
-                             </div>
-                            <div class="space-y-6">
-                                <div>
-                                    <label class="block text-sm text-gray-700 font-medium mb-1">Book Title <span class="text-red-500">*</span></label>
-                                    <input type="text" name="book_title" required value="{{ old('book_title') }}" placeholder="Enter your book title"
-                                        class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label class="block text-sm text-gray-700 font-medium mb-1">Genre <span class="text-red-500">*</span></label>
-                                        <select name="genre" required
-                                            class="w-full bg-gray-50 border border-gray-300 focus:bg-white focus:border-brand-dark focus:ring-0 rounded-sm py-2 px-4 text-gray-700 transition-colors">
-                                            <option value="">Choose</option>
-                                            <option value="Fiction">Fiction</option>
-                                            <option value="Non-Fiction">Non-Fiction</option>
-                                            <option value="Biography">Biography</option>
-                                            <option value="Poetry">Poetry</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm text-gray-700 font-medium mb-1">Number of Words <span class="text-red-500">*</span></label>
-                                        <input type="number" x-model.number="words" name="number_of_words" required min="1" value="{{ old('number_of_words') }}" placeholder="Enter estimated word count"
-                                            class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm text-gray-700 font-medium mb-4">Stage of Manuscript
-                                        <span class="text-red-500">*</span></label>
-                                    <div class="space-y-3">
-                                        <label class="flex items-center space-x-3 cursor-pointer">
-                                            <input type="radio" name="stage_of_manuscript" value="Completed" required {{ old('stage_of_manuscript') == 'Completed' ? 'checked' : '' }}
-                                                class="w-4 h-4 text-brand-dark border-gray-300 focus:ring-brand-dark">
-                                            <span class="text-sm text-gray-700">Completed</span>
-                                        </label>
-                                        <label class="flex items-center space-x-3 cursor-pointer">
-                                            <input type="radio" name="stage_of_manuscript" value="In Progress" required {{ old('stage_of_manuscript') == 'In Progress' ? 'checked' : '' }}
-                                                class="w-4 h-4 text-brand-dark border-gray-300 focus:ring-brand-dark">
-                                            <span class="text-sm text-gray-700">In Progress</span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="pt-4 border-t border-gray-100">
-                                    <label class="block text-sm text-gray-700 font-medium mb-4">Preferred Services
-                                        <span class="text-red-500">*</span></label>
-                                    <p class="text-xs text-gray-500 mb-4 italic">Select the services you require for your project.</p>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <label class="flex items-center space-x-3 cursor-pointer p-3 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
-                                            <input type="checkbox" name="services[]" value="editing" x-model="services"
-                                                class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
-                                            <div class="flex flex-col">
-                                                <span class="text-sm font-medium text-gray-700">Editing</span>
-                                                <span class="text-[10px] text-gray-500">Professional editorial review</span>
-                                            </div>
-                                        </label>
-                                        <label class="flex items-center space-x-3 cursor-pointer p-3 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
-                                            <input type="checkbox" name="services[]" value="formatting" x-model="services"
-                                                class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
-                                            <div class="flex flex-col">
-                                                <span class="text-sm font-medium text-gray-700">Formatting</span>
-                                                <span class="text-[10px] text-gray-500">Layout & interior design</span>
-                                            </div>
-                                        </label>
-                                        <label class="flex items-center space-x-3 cursor-pointer p-3 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
-                                            <input type="checkbox" name="services[]" value="cover" x-model="services"
-                                                class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
-                                            <div class="flex flex-col">
-                                                <span class="text-sm font-medium text-gray-700">Cover Design</span>
-                                                <span class="text-[10px] text-gray-500">Bespoke artistic cover</span>
-                                            </div>
-                                        </label>
-                                        <label class="flex items-center space-x-3 cursor-pointer p-3 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
-                                            <input type="checkbox" name="services[]" value="printing" x-model="services"
-                                                class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
-                                            <div class="flex flex-col">
-                                                <span class="text-sm font-medium text-gray-700">Printing & Dist.</span>
-                                                <span class="text-[10px] text-gray-500">Physical production & sales</span>
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <template x-if="services.length === 0">
-                                        <p class="mt-2 text-xs text-red-500">Please select at least one service.</p>
-                                    </template>
-                                </div>
-
-                                <!-- BOOK PRODUCTION OPTIONS (Conditional on Printing) -->
-                                <div x-show="services.includes('printing')" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" class="pt-8 border-t border-gray-100 space-y-6">
-                                    <div class="flex items-center space-x-3 mb-6">
-                                        <span class="w-8 h-8 bg-brand-accent/10 text-brand-accent rounded-full flex items-center justify-center font-bold text-sm">2</span>
-                                        <h2 class="text-xl font-serif text-gray-900 uppercase tracking-wide">Production Details</h2>
-                                    </div>
-
-                                    <input type="hidden" name="estimated_cost" :value="estimatedTotal">
-
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label class="block text-sm text-gray-700 font-medium mb-1">Print Quantity <span class="text-red-500">*</span></label>
-                                            <input type="number" x-model.number="print_quantity" name="print_quantity" :required="services.includes('printing')" min="1" placeholder="e.g. 500 copies"
-                                                class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
-                                            <p class="text-[10px] text-gray-500 mt-1">Number of physical copies you wish to produce.</p>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm text-gray-700 font-medium mb-1">Estimated Page Count <span class="text-red-500">*</span></label>
-                                            <input type="number" x-model.number="estimated_pages" name="estimated_pages" :required="services.includes('printing')" min="1" placeholder="e.g. 200 pages"
-                                                class="w-full bg-gray-50 border-b border-gray-300 focus:bg-gray-100 focus:border-brand-dark focus:ring-0 rounded-t-sm py-2 px-4 transition-colors">
-                                            <p class="text-[10px] text-gray-500 mt-1">Rough number of pages in your final book.</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label class="block text-sm text-gray-700 font-medium mb-1">Interior Paper <span class="text-red-500">*</span></label>
-                                            <select name="interior_paper" x-model="interior_paper" :required="services.includes('printing')"
-                                                class="w-full bg-gray-50 border border-gray-300 focus:bg-white focus:border-brand-dark focus:ring-0 rounded-sm py-2 px-4 text-gray-700 transition-colors">
-                                                <option value="">Select Paper Type</option>
-                                                @foreach($groupedRates['interior_paper'] ?? [] as $rate)
-                                                    <option value="{{ $rate->key }}">{{ $rate->label }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm text-gray-700 font-medium mb-1">Cover Paper <span class="text-red-500">*</span></label>
-                                            <select name="cover_paper" x-model="cover_paper" :required="services.includes('printing')"
-                                                class="w-full bg-gray-50 border border-gray-300 focus:bg-white focus:border-brand-dark focus:ring-0 rounded-sm py-2 px-4 text-gray-700 transition-colors">
-                                                <option value="">Select Cover Material</option>
-                                                @foreach($groupedRates['special_paper'] ?? [] as $rate)
-                                                    <option value="{{ $rate->key }}">{{ $rate->label }}</option>
-                                                @endforeach
-                                                @foreach($groupedRates['cover_paper'] ?? [] as $rate)
-                                                    <option value="{{ $rate->key }}">{{ $rate->label }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="space-y-4">
-                                        <label class="block text-sm text-gray-700 font-medium mb-2">Enhancements</label>
-                                        <div class="flex flex-wrap gap-4">
-                                            <label class="flex items-center space-x-2 cursor-pointer group">
-                                                <input type="checkbox" name="is_hard_cover" x-model="is_hard_cover" class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
-                                                <span class="text-xs text-gray-600 group-hover:text-gray-900 transition-colors">Hard Cover</span>
-                                            </label>
-                                            <label class="flex items-center space-x-2 cursor-pointer group">
-                                                <input type="checkbox" name="is_embossed" x-model="is_embossed" class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
-                                                <span class="text-xs text-gray-600 group-hover:text-gray-900 transition-colors">Embossing</span>
-                                            </label>
-                                            <label class="flex items-center space-x-2 cursor-pointer group">
-                                                <input type="checkbox" name="is_packaged" x-model="is_packaged" class="w-4 h-4 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
-                                                <span class="text-xs text-gray-600 group-hover:text-gray-900 transition-colors">Premium Packaging</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-
-                    <!-- STEP 2: UPLOADS & ASSURANCES -->
-                    <div id="step-container-2" x-show="step === 2" x-transition.opacity.duration.300ms
-                        class="step-container space-y-8" style="display: none;">
-                        <section class="bg-white p-6 md:p-8 shadow-sm border border-gray-100">
-                            <div class="flex items-center space-x-3 mb-2">
-                                <h2 class="text-xl font-serif text-gray-900 uppercase tracking-wide">Uploads</h2>
-                            </div>
-                            <p class="text-sm font-medium italic text-gray-700 mb-6">Please submit the materials
-                                relevant to your publishing package.</p>
-
-                            <div class="space-y-6">
-                                <div class="border border-gray-200 bg-gray-50 p-6 rounded-md">
-                                    <label class="block text-sm text-gray-900 font-medium mb-2">Manuscript / Excerpt
-                                        (required) <span class="text-red-500">*</span></label>
-                                    <p class="text-xs text-gray-600 mb-4">Acceptable formats: .doc, .docx, .pdf.</p>
-                                    <input type="file" name="manuscript_file" accept=".doc,.docx,.pdf" required
-                                        class="block w-full max-w-sm text-sm text-gray-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-sm file:border file:border-brand-dark file:text-sm file:font-medium file:bg-white file:text-brand-dark hover:file:bg-gray-50 cursor-pointer">
-                                </div>
-
-                                <div class="border border-gray-200 bg-gray-50 p-6 rounded-md">
-                                    <label class="block text-sm text-gray-900 font-medium mb-2">Cover Design Reference
-                                        (Optional)</label>
-                                    <p class="text-xs text-gray-600 mb-4">Have a concept? Upload accepted formats: .jpg,
-                                        .jpeg, .png, .pdf.</p>
-                                    <input type="file" name="cover_design_file" accept=".pdf,.jpg,.jpeg,.png"
-                                        class="block w-full max-w-sm text-sm text-gray-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-sm file:border file:border-brand-dark file:text-sm file:font-medium file:bg-white file:text-brand-dark hover:file:bg-gray-50 cursor-pointer">
-                                </div>
-                            </div>
-                        </section>
-
-                        <section class="bg-white shadow-sm overflow-hidden border border-gray-200 border-l-4 border-l-brand-accent" x-data="{ open: false, signed: false, signName: '' }">
-                            <div class="flex items-center space-x-3 bg-gray-50 px-6 py-4 md:px-8 border-b border-gray-200">
-                                <span class="w-8 h-8 bg-brand-accent/10 text-brand-accent rounded-full flex items-center justify-center font-bold text-sm">3</span>
-                                <h2 class="text-xl font-serif text-gray-900 uppercase tracking-wide">Submission Agreement</h2>
-                            </div>
-                            <div class="p-6 md:p-8 space-y-6">
-                                <div class="flex items-center justify-between bg-gray-50 p-6 border border-dashed border-gray-300 rounded-sm">
-                                    <div class="flex items-center space-x-4">
-                                        <template x-if="signed">
-                                            <div class="bg-green-100 p-2 rounded-full text-green-600">
-                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                            </div>
-                                        </template>
-                                        <template x-if="!signed">
-                                            <div class="bg-brand-accent/10 p-2 rounded-full text-brand-accent">
-                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                            </div>
-                                        </template>
-                                        <div>
-                                            <p class="font-bold text-gray-900" x-text="signed ? 'Agreement Signed Successfully' : 'Legal Signature Required'"></p>
-                                            <p class="text-xs text-gray-500" x-text="signed ? 'Signed by ' + signName : 'Please review and sign the terms to proceed'"></p>
-                                        </div>
-                                    </div>
-                                    <button type="button" @click="open = true" class="px-6 py-3 bg-brand-dark text-white text-xs font-bold tracking-widest uppercase hover:bg-gray-800 transition-colors">
-                                        <span x-text="signed ? 'REVIEW SIGNATURE' : 'REVIEW & SIGN AGREEMENT'"></span>
-                                    </button>
-                                </div>
-
-                                {{-- Hidden Fields for Submission --}}
-                                <input type="hidden" name="agreement_terms" :value="signed ? '1' : ''" required>
-                                <input type="hidden" name="agreement_name" x-model="signName" required>
-
-                                {{-- Signing Modal --}}
-                                <div x-show="open" 
-                                     x-transition:enter="transition ease-out duration-300"
-                                     x-transition:enter-start="opacity-0"
-                                     x-transition:enter-end="opacity-100"
-                                     x-transition:leave="transition ease-in duration-200"
-                                     x-transition:leave-start="opacity-100"
-                                     x-transition:leave-end="opacity-0"
-                                     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-                                     @keydown.escape.window="open = false"
-                                     style="display: none;">
+                                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Primary Genre <span class="text-red-500">*</span></label>
                                     
-                                    <div class="bg-white max-w-2xl w-full shadow-2xl rounded-sm overflow-hidden" @click.away="open = false">
-                                        <div class="p-8 border-b border-gray-100 flex items-center justify-between">
-                                            <h3 class="text-2xl font-serif font-bold">Submission Agreement</h3>
-                                            <button type="button" @click="open = false" class="text-gray-400 hover:text-gray-900">
-                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                            </button>
-                                        </div>
-                                        
-                                        <div class="p-8 max-h-[400px] overflow-y-auto bg-gray-50 text-sm text-gray-600 leading-relaxed space-y-4">
-                                            <p class="font-bold text-gray-900">Please read the following terms carefully:</p>
-                                            <p><strong>1. Confidentiality:</strong> The Curated Archive acknowledges that the manuscript submitted is the intellectual property of the Author and is confidential. We will not reproduce, distribute, or disclose the contents to third parties without explicit consent, except for internal evaluation.</p>
-                                            <p><strong>2. Evaluation Purpose:</strong> The manuscript is submitted solely for the purpose of evaluation by our editorial team. This submission does not constitute a guarantee of publication. A separate Publishing Agreement will be issued upon acceptance.</p>
-                                            <p><strong>3. Warranty:</strong> The Author warrants that they are the sole owner of the work and that it does not infringe upon any existing copyright or legal rights of others.</p>
-                                            <p><strong>4. Data Usage:</strong> You consent to the storage of your contact information for the purpose of communicating about this submission.</p>
-                                        </div>
+                                    <select name="genre" id="genre-select" required x-model="genre" @change="genre = $event.target.value"
+                                            class="w-full bg-gray-50 border border-gray-200 rounded py-2.5 px-3.5 text-sm text-gray-900 focus:bg-white focus:border-brand-dark focus:ring-0 transition">
+                                        <option value="Fiction" 
+                                                x-text="currency === 'NGN' ? 'Fiction (₦' + Number(0.010 * exchangeRate).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '/word)' : 'Fiction ($0.010/word)'"
+                                                data-usd="Fiction ($0.010/word)" 
+                                                data-ngn="Fiction (₦15.00/word)">Fiction ($0.010/word)</option>
+                                        <option value="Non-Fiction" 
+                                                x-text="currency === 'NGN' ? 'Non-Fiction (₦' + Number(0.012 * exchangeRate).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '/word)' : 'Non-Fiction ($0.012/word)'"
+                                                data-usd="Non-Fiction ($0.012/word)" 
+                                                data-ngn="Non-Fiction (₦18.00/word)">Non-Fiction ($0.012/word)</option>
+                                        <option value="Biography/Memoir" 
+                                                x-text="currency === 'NGN' ? 'Biography / Memoir (₦' + Number(0.014 * exchangeRate).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '/word)' : 'Biography / Memoir ($0.014/word)'"
+                                                data-usd="Biography / Memoir ($0.014/word)" 
+                                                data-ngn="Biography / Memoir (₦21.00/word)">Biography / Memoir ($0.014/word)</option>
+                                        <option value="Sci-Fi/Fantasy" 
+                                                x-text="currency === 'NGN' ? 'Sci-Fi / Fantasy (₦' + Number(0.015 * exchangeRate).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '/word)' : 'Sci-Fi / Fantasy ($0.015/word)'"
+                                                data-usd="Sci-Fi / Fantasy ($0.015/word)" 
+                                                data-ngn="Sci-Fi / Fantasy (₦22.50/word)">Sci-Fi / Fantasy ($0.015/word)</option>
+                                        <option value="Academic/Business" 
+                                                x-text="currency === 'NGN' ? 'Academic / Business (₦' + Number(0.018 * exchangeRate).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '/word)' : 'Academic / Business ($0.018/word)'"
+                                                data-usd="Academic / Business ($0.018/word)" 
+                                                data-ngn="Academic / Business (₦27.00/word)">Academic / Business ($0.018/word)</option>
+                                    </select>
 
-                                        <div class="p-8 space-y-6">
-                                            <div>
-                                                <label class="flex items-center space-x-3 cursor-pointer">
-                                                    <input type="checkbox" x-model="signed" class="w-5 h-5 text-brand-dark border-gray-300 rounded focus:ring-brand-dark cursor-pointer">
-                                                    <span class="text-sm font-medium text-gray-700">I acknowledge and agree to the terms stated above.</span>
-                                                </label>
-                                            </div>
-                                            
-                                            <div x-show="signed" x-transition>
-                                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Electronic Signature (Full Name)</label>
-                                                <input type="text" x-model="signName" placeholder="Type your full legal name" 
-                                                       class="w-full border-b-2 border-gray-200 focus:border-brand-accent py-3 font-serif text-xl outline-none transition-colors">
-                                            </div>
+                                    <div class="mt-2 flex items-center justify-between text-xs text-gray-500">
+                                        <span>Active Word Rate: <strong class="text-brand-dark font-bold font-mono" x-text="genreRateLabel"></strong></span>
+                                        <span class="text-[11px] text-gray-400">Live rate per word</span>
+                                    </div>
+                                </div>
 
-                                            <div class="pt-4 flex items-center justify-end space-x-4">
-                                                <button type="button" @click="open = false" class="text-sm font-bold text-gray-400 hover:text-gray-900 px-6">CANCEL</button>
-                                                <button type="button" @click="if(signed && signName) { open = false } else { alert('Please sign and provide your name') }" 
-                                                        class="bg-brand-accent text-white font-bold text-xs tracking-widest px-8 py-4 uppercase hover:bg-brand-accentHover transition-colors disabled:opacity-50">
-                                                    CONFIRM SIGNATURE
-                                                </button>
-                                            </div>
-                                        </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Total Word Count <span class="text-red-500">*</span></label>
+                                    <input type="number" name="number_of_words" min="500" required 
+                                           x-model.number="wordCount"
+                                           placeholder="e.g. 65000"
+                                           class="w-full bg-gray-50 border border-gray-200 rounded py-2.5 px-3.5 text-sm text-gray-900 focus:bg-white focus:border-brand-dark focus:ring-0 transition">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Manuscript Stage</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label class="flex items-center space-x-2 border p-3 rounded cursor-pointer hover:bg-gray-50"
+                                           :class="stage === 'Completed' ? 'border-brand-dark bg-gray-50' : 'border-gray-200'">
+                                        <input type="radio" name="stage_of_manuscript" value="Completed" x-model="stage" class="text-brand-dark focus:ring-brand-dark">
+                                        <span class="text-xs font-medium text-gray-800">Completed Draft</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 border p-3 rounded cursor-pointer hover:bg-gray-50"
+                                           :class="stage === 'In Progress' ? 'border-brand-dark bg-gray-50' : 'border-gray-200'">
+                                        <input type="radio" name="stage_of_manuscript" value="In Progress" x-model="stage" class="text-brand-dark focus:ring-brand-dark">
+                                        <span class="text-xs font-medium text-gray-800">In-Progress WIP</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Section 3: Add-On Production Services (Hidden if Traditional) -->
+                    <section x-show="!isTraditional" x-transition.opacity.duration.300ms
+                             class="bg-white p-6 md:p-8 shadow-sm border border-gray-200 rounded-sm">
+                        <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-100">
+                            <span class="w-7 h-7 bg-brand-dark text-white rounded-full flex items-center justify-center font-bold text-xs">3</span>
+                            <h2 class="text-lg font-serif font-bold text-gray-900 uppercase tracking-wide">Add-On Production Services</h2>
+                        </div>
+
+                        <div class="space-y-3">
+                            <label class="flex items-start space-x-3 p-3.5 border rounded cursor-pointer hover:bg-gray-50 transition"
+                                   :class="includeProofreading ? 'border-brand-accent bg-amber-50/20' : 'border-gray-200'">
+                                <input type="checkbox" name="include_proofreading" value="1" x-model="includeProofreading"
+                                       class="w-4 h-4 mt-0.5 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
+                                <div class="flex-1 flex justify-between items-center">
+                                    <div>
+                                        <span class="text-sm font-bold text-gray-900 block">Professional Proofreading</span>
+                                        <span class="text-xs text-gray-500">Orthographic line edit and grammatical refinement</span>
+                                    </div>
+                                    <span class="text-xs font-bold text-brand-dark" x-text="formatCurrency(cleanWordCount * 0.005) + ' (+' + (currency === 'NGN' ? '₦' + (0.005 * exchangeRate).toFixed(2) : '$0.005') + '/w)'"></span>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start space-x-3 p-3.5 border rounded cursor-pointer hover:bg-gray-50 transition"
+                                   :class="includeCoverDesign ? 'border-brand-accent bg-amber-50/20' : 'border-gray-200'">
+                                <input type="checkbox" name="include_cover_design" value="1" x-model="includeCoverDesign"
+                                       class="w-4 h-4 mt-0.5 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
+                                <div class="flex-1 flex justify-between items-center">
+                                    <div>
+                                        <span class="text-sm font-bold text-gray-900 block">Custom Cover Design Package</span>
+                                        <span class="text-xs text-gray-500">Bespoke print-ready jacket, barcode alignment & 3D mockups</span>
+                                    </div>
+                                    <span class="text-xs font-bold text-brand-dark" x-text="formatCurrency(300)"></span>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start space-x-3 p-3.5 border rounded cursor-pointer hover:bg-gray-50 transition"
+                                   :class="includeMarketingPackage ? 'border-brand-accent bg-amber-50/20' : 'border-gray-200'">
+                                <input type="checkbox" name="include_marketing_package" value="1" x-model="includeMarketingPackage"
+                                       class="w-4 h-4 mt-0.5 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
+                                <div class="flex-1 flex justify-between items-center">
+                                    <div>
+                                        <span class="text-sm font-bold text-gray-900 block">Author Marketing & Launch Package</span>
+                                        <span class="text-xs text-gray-500">ARC campaign distribution, store blurb optimization & pre-order setup</span>
+                                    </div>
+                                    <span class="text-xs font-bold text-brand-dark" x-text="formatCurrency(500)"></span>
+                                </div>
+                            </label>
+                        </div>
+                    </section>
+
+                    <!-- Section 4: Physical Bulk Print Calculator (Hidden if Traditional) -->
+                    <section x-show="!isTraditional" x-transition.opacity.duration.300ms
+                             class="bg-white p-6 md:p-8 shadow-sm border border-gray-200 rounded-sm">
+                        <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-100">
+                            <span class="w-7 h-7 bg-brand-dark text-white rounded-full flex items-center justify-center font-bold text-xs">4</span>
+                            <h2 class="text-lg font-serif font-bold text-gray-900 uppercase tracking-wide">Physical Bulk Print Calculator</h2>
+                        </div>
+
+                        <div class="space-y-5">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Book Trim Size <span class="text-red-500">*</span></label>
+                                    <select name="trim_size" x-model="trimSize"
+                                            class="w-full bg-gray-50 border border-gray-200 rounded py-2.5 px-3.5 text-sm text-gray-900 focus:bg-white focus:border-brand-dark focus:ring-0 transition">
+                                        <option value="five_by_eight">5" x 8" Pocket (300 words/page)</option>
+                                        <option value="six_by_nine">6" x 9" Trade Paperback (350 words/page)</option>
+                                        <option value="seven_by_ten">7" x 10" Executive (400 words/page)</option>
+                                    </select>
+                                    <span class="text-[11px] text-gray-500 mt-1 block">
+                                        Estimated Book Pages: <strong class="text-gray-900" x-text="estimatedPages"></strong>
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Binding Format <span class="text-red-500">*</span></label>
+                                    
+                                    <select name="binding_type" id="binding-select" required x-model="bindingType" @change="bindingType = $event.target.value"
+                                            class="w-full bg-gray-50 border border-gray-200 rounded py-2.5 px-3.5 text-sm text-gray-900 focus:bg-white focus:border-brand-dark focus:ring-0 transition">
+                                        <option value="paperback" 
+                                                x-text="currency === 'NGN' ? 'Standard Paperback (₦' + Number(2.50 * exchangeRate).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' base)' : 'Standard Paperback ($2.50 base)'"
+                                                data-usd="Standard Paperback ($2.50 base)" 
+                                                data-ngn="Standard Paperback (₦3,750.00 base)">Standard Paperback ($2.50 base)</option>
+                                        <option value="hardcover" 
+                                                x-text="currency === 'NGN' ? 'Premium Hardcover (₦' + Number(6.00 * exchangeRate).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' base)' : 'Premium Hardcover ($6.00 base)'"
+                                                data-usd="Premium Hardcover ($6.00 base)" 
+                                                data-ngn="Premium Hardcover (₦9,000.00 base)">Premium Hardcover ($6.00 base)</option>
+                                    </select>
+
+                                    <div class="mt-2 flex items-center justify-between text-xs text-gray-500">
+                                        <span>Unit Press Cost: <strong class="text-brand-dark font-bold font-mono" x-text="formatCurrency(unitPrintCostUsd) + ' / copy'"></strong></span>
+                                        <span class="text-[11px] text-gray-400" x-text="estimatedPages + ' pgs'"></span>
                                     </div>
                                 </div>
                             </div>
-                        </section>
-                    </div>
 
-                    <!-- Navigation Controls -->
-                    <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-                        <button type="button" x-show="step > 1" @click="window.scrollTo(0, 0); step--"
-                            class="px-6 py-3 border border-gray-300 bg-white text-gray-700 font-medium rounded-sm hover:bg-gray-50 transition-colors"
-                            style="display: none;">
-                            &larr; Previous Step
-                        </button>
-                        <div x-show="step === 1" class="w-1"></div> <!-- Spacer -->
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">
+                                    Physical Print Quantity (Minimum 500 Copies) <span class="text-red-500">*</span>
+                                </label>
+                                <div class="flex items-center space-x-4">
+                                    <input type="number" name="print_quantity" min="500" step="50"
+                                           x-model.number="printQuantity"
+                                           class="w-40 bg-gray-50 border border-gray-200 rounded py-2.5 px-3.5 text-sm text-gray-900 font-bold focus:bg-white focus:border-brand-dark focus:ring-0 transition">
+                                    <span class="text-xs text-gray-500">Enforced partner press minimum run: 500 copies.</span>
+                                </div>
+                            </div>
 
-                        <!-- Client-side validation before moving next step -->
-                        <button type="button" x-show="step < maxStep" @click="
-                            let container = document.getElementById('step-container-' + step);
-                            let inputs = container.querySelectorAll('input[required], select[required], textarea[required]');
-                            let isValid = true;
-                            for (let input of inputs) {
-                                if (!input.checkValidity()) {
-                                    input.reportValidity();
-                                    isValid = false;
-                                    break;
-                                }
-                            }
-                            if (isValid) {
-                                step++;
-                                window.scrollTo(0, 0);
-                            }
-                        "
-                            class="px-6 py-3 bg-brand-dark text-white font-medium rounded-sm hover:bg-gray-800 transition-colors shadow-sm ml-auto">
-                            Next Step &rarr;
+                            <div class="bg-gray-50 p-4 rounded border border-gray-200 text-xs flex justify-between items-center">
+                                <div>
+                                    <span class="font-bold text-gray-700 block">Estimated Unit Printing Cost:</span>
+                                    <span class="text-gray-500" x-text="formatCurrency(unitPrintCostUsd) + ' per manufactured copy'"></span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="font-bold text-gray-700 block">Total Bulk Press Allocation:</span>
+                                    <span class="text-sm font-bold text-brand-dark" x-text="formatCurrency(totalBulkPrintUsd)"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Section 5: Manuscript Upload & Electronic Verification -->
+                    <section class="bg-white p-6 md:p-8 shadow-sm border border-gray-200 rounded-sm">
+                        <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-100">
+                            <span class="w-7 h-7 bg-brand-dark text-white rounded-full flex items-center justify-center font-bold text-xs">5</span>
+                            <h2 class="text-lg font-serif font-bold text-gray-900 uppercase tracking-wide">File Assets & Verification</h2>
+                        </div>
+
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">
+                                    Manuscript Document (.pdf, .doc, .docx) <span class="text-red-500">*</span>
+                                </label>
+                                <input type="file" name="manuscript_file" required accept=".pdf,.doc,.docx"
+                                       class="w-full text-xs text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+                                <span class="text-[11px] text-gray-400 mt-1 block">Please attach your full or excerpt manuscript file.</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Cover Concept (Optional)</label>
+                                <input type="file" name="cover_design_file" accept=".jpeg,.png,.jpg,.pdf"
+                                       class="w-full text-xs text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+                            </div>
+
+                            <div class="pt-4 border-t border-gray-100 space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Author Electronic Signature Name <span class="text-red-500">*</span></label>
+                                    <input type="text" name="agreement_name" required placeholder="Type your full legal name to verify"
+                                           :value="signatureName || authorName"
+                                           @input="signatureName = $event.target.value"
+                                           class="w-full bg-gray-50 border border-gray-200 rounded py-2.5 px-3.5 text-sm text-gray-900 focus:bg-white focus:border-brand-dark focus:ring-0 transition">
+                                </div>
+
+                                <label class="flex items-start space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" name="agreement_terms" value="1" checked required
+                                           class="w-4 h-4 mt-0.5 text-brand-dark border-gray-300 rounded focus:ring-brand-dark">
+                                    <span class="text-xs text-gray-600">
+                                        I hereby certify that I hold full legal intellectual property rights to this work and agree to the submission evaluation terms.
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Submit Button -->
+                    <div>
+                        <button type="submit" 
+                                :disabled="isSubmitting"
+                                class="w-full py-4 bg-brand-dark text-white font-serif tracking-widest text-sm uppercase font-bold hover:bg-gray-800 transition shadow-sm disabled:opacity-50">
+                            <span x-show="!isSubmitting">Submit Manuscript for Evaluation</span>
+                            <span x-show="isSubmitting">Transmitting Document Package...</span>
                         </button>
                     </div>
 
                 </div>
 
-                <!-- Right Column (Sidebar) -->
-                <div class="w-full lg:w-1/3">
-                    <div class="sticky top-8 space-y-6">
+                <!-- Right Column: Live Dynamic Overview Panel -->
+                <div class="w-full lg:w-5/12">
+                    <div class="bg-white p-6 md:p-8 shadow-sm border border-gray-200 rounded-sm sticky top-28 space-y-6">
 
-                        <!-- Investment Estimate Card -->
-                        <div class="bg-brand-dark text-white p-8 shadow-sm rounded-sm">
-                            <div class="flex items-center space-x-3 mb-8">
-                                <svg class="w-5 h-5 text-brand-accent" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                <h2 class="text-xl font-serif text-white tracking-wide">Publishing Profile</h2>
+                        <!-- Triage Category Indicator Badge -->
+                        <div>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Automated Triage Classification</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2.5 h-2.5 rounded-full" :class="isTraditional ? 'bg-emerald-500 animate-pulse' : 'bg-brand-accent'"></span>
+                                <span class="font-serif font-bold text-lg text-gray-900" x-text="isTraditional ? 'Traditional Publishing Candidate' : 'Osisi Hybrid Publishing Model'"></span>
                             </div>
-
-                            <div class="mt-4 mb-6 p-4 bg-gray-800 rounded border border-gray-700 shadow-inner">
-                                <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Estimated Investment
-                                </div>
-                                <div class="text-2xl font-serif text-brand-accent">
-                                    <span class="text-lg opacity-70 mr-1">₦</span>
-                                    <span x-text="Number(estimatedTotal).toLocaleString()">150,000</span>
-                                </div>
-                                <p class="text-[10px] text-gray-500 mt-2 italic">Includes base platform fee and
-                                    word-count formatting rate.</p>
-                            </div>
-
-                            <div class="border-t border-gray-700 pt-6 mb-8">
-                                <p class="text-sm leading-relaxed text-gray-300">
-                                    Complete the <span x-text="maxStep"></span>-step process to finalize your publishing
-                                    enquiry.
-                                </p>
-                                <div class="mt-4 flex flex-col space-y-2">
-                                    <div class="flex items-center justify-between text-xs text-gray-400">
-                                        <span>Progress:</span>
-                                        <span x-text="Math.round((step/maxStep)*100) + '%'"></span>
-                                    </div>
-                                    <div class="w-full bg-gray-700 h-1 rounded-full overflow-hidden">
-                                        <div class="bg-brand-accent h-1 transition-all duration-300"
-                                            :style="'width: ' + ((step/maxStep)*100) + '%'"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button x-show="step === maxStep" type="submit"
-                                :disabled="isSubmitting"
-                                class="w-full bg-brand-accent text-white py-4 font-bold tracking-widest hover:bg-brand-accentHover transition-colors flex justify-center items-center group rounded-sm disabled:opacity-70 disabled:cursor-not-allowed"
-                                style="display: none;">
-                                <svg x-show="isSubmitting" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" style="display: none;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <span x-text="isSubmitting ? 'PROCESSING...' : 'SUBMIT PROSPECT'">SUBMIT PROSPECT</span>
-                                <svg x-show="!isSubmitting" class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
-                            </button>
-                            <button x-show="step < maxStep" type="button"
-                                @click="$el.closest('form').querySelector('button[type=button][x-show=\'step < maxStep\']').click()"
-                                class="w-full bg-gray-500 text-white py-4 font-bold tracking-widest hover:bg-gray-600 transition-colors flex justify-center items-center rounded-sm">
-                                CONTINUE
-                            </button>
+                            <p class="text-xs text-gray-500 mt-1" x-text="triageExplanation"></p>
                         </div>
 
-                        <!-- Assistance Card -->
-                        <div class="bg-gray-100 p-8 text-center border border-gray-200 rounded-sm">
-                            <div
-                                class="inline-flex justify-center items-center w-10 h-10 rounded bg-white text-gray-600 mb-4 shadow-sm">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
+                        <!-- CASE 1: TRADITIONAL CANDIDATE BANNER -->
+                        <template x-if="isTraditional">
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-sm p-5 space-y-3">
+                                <div class="flex items-center space-x-2 text-emerald-800 font-bold text-sm">
+                                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                    <span>Pre-Qualified Acquisition Candidate</span>
+                                </div>
+                                <p class="text-xs text-emerald-900 leading-relaxed">
+                                    Based on your demographic profile, audience reach, and high-potential fiction classification, your project is pre-qualified for <strong>Traditional Acquisition Board Review</strong>.
+                                </p>
+                                <div class="bg-white/80 p-3 rounded text-[11px] text-emerald-950 font-medium">
+                                    ✓ All setup fees waived<br>
+                                    ✓ All editorial production funded by publisher<br>
+                                    ✓ Bulk print module bypassed
+                                </div>
+                                <p class="text-[11px] text-emerald-700 italic">
+                                    Upon submission, the Acquisition Admin team will review your manuscript chapter proof for advance offer terms.
+                                </p>
                             </div>
-                            <h3 class="text-base font-serif text-gray-900 mb-2">Need Assistance?</h3>
-                            <p class="text-sm text-gray-500 mb-3">Our concierge team is available to help.</p>
-                            <a href="mailto:concierge@curatedarchive.com"
-                                class="text-sm text-gray-900 hover:text-brand-accent transition-colors font-medium">concierge@curatedarchive.com</a>
+                        </template>
+
+                        <!-- CASE 2: OSISI HYBRID DYNAMIC COST BREAKDOWN -->
+                        <template x-if="!isTraditional">
+                            <div class="space-y-4">
+                                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-2">
+                                    Project Financial Overview
+                                </h3>
+
+                                <div class="space-y-2.5 text-xs text-gray-600">
+                                    <div class="flex justify-between items-center">
+                                        <span>Base Operations Fee</span>
+                                        <span class="font-semibold text-gray-900" x-text="formatCurrency(150)"></span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span>Genre Editorial Fee (<span x-text="genreRateLabel"></span> • <span x-text="cleanWordCount.toLocaleString() + ' words'"></span>)</span>
+                                        <span class="font-semibold text-gray-900" x-text="formatCurrency(genreWordFeeUsd)"></span>
+                                    </div>
+
+                                    <template x-if="includeProofreading">
+                                        <div class="flex justify-between items-center text-brand-dark">
+                                            <span>Proofreading Service</span>
+                                            <span class="font-semibold" x-text="formatCurrency(cleanWordCount * 0.005)"></span>
+                                        </div>
+                                    </template>
+
+                                    <template x-if="includeCoverDesign">
+                                        <div class="flex justify-between items-center text-brand-dark">
+                                            <span>Cover Design Package</span>
+                                            <span class="font-semibold" x-text="formatCurrency(300)"></span>
+                                        </div>
+                                    </template>
+
+                                    <template x-if="includeMarketingPackage">
+                                        <div class="flex justify-between items-center text-brand-dark">
+                                            <span>Marketing Launch Package</span>
+                                            <span class="font-semibold" x-text="formatCurrency(500)"></span>
+                                        </div>
+                                    </template>
+
+                                    <div class="pt-2 border-t border-dashed border-gray-200 flex justify-between items-center font-medium text-gray-700">
+                                        <span>Subtotal Editorial & Design</span>
+                                        <span class="font-bold text-gray-900" x-text="formatCurrency(totalEditorialFeeUsd)"></span>
+                                    </div>
+
+                                    <div class="flex justify-between items-center pt-1 text-gray-700">
+                                        <div>
+                                            <span>Bulk Physical Print (<span x-text="printQuantity"></span> copies)</span>
+                                            <span class="block text-[10px] text-gray-400" x-text="estimatedPages + ' pgs • ' + bindingType"></span>
+                                        </div>
+                                        <span class="font-bold text-gray-900" x-text="formatCurrency(totalBulkPrintUsd)"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Grand Total -->
+                                <div class="pt-4 border-t-2 border-gray-900 flex justify-between items-baseline">
+                                    <div>
+                                        <span class="text-xs uppercase font-bold text-gray-500 tracking-wider block">Estimated Total</span>
+                                        <span class="text-[10px] text-gray-400" x-text="'Merchant Gateway: ' + (currency === 'USD' ? 'Stripe International' : 'Paystack Nigeria')"></span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-2xl font-serif font-bold text-brand-dark" x-text="formatCurrency(grandTotalUsd)"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Gateway Badge -->
+                                <div class="bg-gray-50 p-3 rounded flex items-center justify-between text-[11px] text-gray-500">
+                                    <span>Routing Merchant:</span>
+                                    <span class="font-bold text-gray-800" x-text="currency === 'USD' ? '💳 Stripe Payment Intent' : '⚡ Paystack Naira Gateway'"></span>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Legal Disclaimer Notice -->
+                        <div class="pt-4 border-t border-gray-100">
+                            <p class="text-[11px] text-gray-400 italic leading-relaxed">
+                                {{ $disclaimer }}
+                            </p>
                         </div>
 
                     </div>
@@ -549,104 +597,198 @@
     </main>
 
     <!-- Footer -->
-    <footer class="mt-auto border-t border-gray-200 py-8 bg-brand-bg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div
-                class="flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 space-y-4 md:space-y-0">
-                <div class="font-serif italic text-sm text-gray-900">
-                    The Curated Archive
-                </div>
-                <div class="flex space-x-6">
-                    <a href="#" class="hover:text-gray-900">Privacy Policy</a>
-                    <a href="#" class="hover:text-gray-900">Terms of Service</a>
-                    <a href="#" class="hover:text-gray-900">Journal</a>
-                    <a href="#" class="hover:text-gray-900">Contact</a>
-                </div>
-                <div>
-                    &copy; 2024 The Curated Archive. All Rights Reserved.
-                </div>
-            </div>
+    <footer class="mt-auto border-t border-gray-200 py-8 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-xs text-gray-500 flex flex-col md:flex-row justify-between items-center gap-4">
+            <span class="font-serif italic text-gray-900 font-bold">The Curated Archive</span>
+            <span>&copy; {{ date('Y') }} The Curated Archive. All Rights Reserved.</span>
         </div>
     </footer>
+
+    <!-- Alpine.js Dynamic Triage & Calculation Engine -->
     <script>
-        document.addEventListener('alpine:init', () => {
-             Alpine.data('enquiryForm', () => ({
-                step: 1, 
-                maxStep: 2,
+        function triageForm() {
+            return {
+                currency: 'USD',
+                exchangeRate: {{ (float) ($exchangeRate ?? 1500) }},
                 isSubmitting: false,
-                words: {{ (int)old('number_of_words', 0) }},
-                services: @json(old('services', ['editing'])),
-                allRates: @json($rates),
                 
-                // Production Details
-                print_quantity: 600,
-                estimated_pages: 120, // Default assumption
-                interior_paper: '',
-                cover_paper: '',
-                is_hard_cover: false,
-                is_embossed: false,
-                is_packaged: false,
+                // Author Demographics
+                authorName: '{{ old('name', '') }}',
+                signatureName: '{{ old('agreement_name', '') }}',
+                authorAge: {{ (int) old('author_age', 32) }},
+                hasSocialPresence: false,
+                isEstablishedAuthor: false,
 
-                get estimatedTotal() {
-                    let r = this.allRates || {};
-                    let setup = parseFloat(r.fixed_setup_fee);
-                    let total = isNaN(setup) ? 150000 : setup;
+                // Manuscript Dimensions
+                genre: '{{ old('genre', 'Fiction') }}',
+                wordCount: {{ (int) old('number_of_words', 60000) }},
+                stage: 'Completed',
+
+                // Add-ons
+                includeProofreading: false,
+                includeCoverDesign: true,
+                includeMarketingPackage: false,
+
+                // Production specs
+                trimSize: 'six_by_nine',
+                bindingType: 'paperback',
+                printQuantity: 500,
+
+                init() {
+                    this.updateDropdownLabels();
+                },
+
+                setCurrency(curr) {
+                    this.currency = curr;
+                    this.$nextTick(() => {
+                        this.updateDropdownLabels();
+                    });
+                },
+
+                updateDropdownLabels() {
+                    let isNgn = (this.currency === 'NGN');
                     
-                    // Editorial costs
-                    if (this.services && this.services.includes('editing')) {
-                        let fixed = parseFloat(r.fixed_editing_fee) || 0;
-                        let perWord = parseFloat(r.editing_per_word) || 5;
-                        total += fixed + (this.words * perWord);
-                    }
-                    
-                    if (this.services && this.services.includes('formatting')) {
-                        let fixed = parseFloat(r.fixed_formatting_fee) || 0;
-                        let perWord = parseFloat(r.formatting_per_word) || 2;
-                        total += fixed + (this.words * perWord);
-                    }
-                    
-                    if (this.services && this.services.includes('cover')) {
-                        total += parseFloat(r.fixed_cover_design_fee) || 50000;
-                    }
-                    
-                    // Advanced Printing costs
-                    if (this.services && this.services.includes('printing')) {
-                        // 1. Interior Paper
-                        if (this.interior_paper && r[this.interior_paper]) {
-                            // Rough calculation for rims: (qty * pages) / (pages per sheet * 500)
-                            let rims = Math.ceil((this.print_quantity * this.estimated_pages) / (32 * 500));
-                            total += rims * parseFloat(r[this.interior_paper]);
-                        } else {
-                            total += parseFloat(r.fixed_printing_fee) || 100000;
+                    let genreSelect = document.getElementById('genre-select');
+                    if (genreSelect) {
+                        for (let i = 0; i < genreSelect.options.length; i++) {
+                            let opt = genreSelect.options[i];
+                            let label = isNgn ? opt.getAttribute('data-ngn') : opt.getAttribute('data-usd');
+                            if (label) {
+                                opt.text = label;
+                                opt.textContent = label;
+                            }
                         }
-
-                        // 2. Cover Paper
-                        if (this.cover_paper && r[this.cover_paper]) {
-                            total += parseFloat(r[this.cover_paper]);
-                        }
-
-                        // 3. Finishing Operations (per book)
-                        let finishing = (parseFloat(r.calc_folding) || 50) + 
-                                        (parseFloat(r.calc_lamination) || 70) + 
-                                        (parseFloat(r.calc_binding) || 50) + 
-                                        (parseFloat(r.calc_cutting) || 20);
-                        
-                        total += (finishing * this.print_quantity);
-
-                        // 4. Special Effects
-                        if (this.is_hard_cover) total += (parseFloat(r.calc_hard_cover) || 3000) * this.print_quantity;
-                        if (this.is_embossed) total += (parseFloat(r.calc_embossing) || 500) * this.print_quantity;
-                        if (this.is_packaged) total += (parseFloat(r.calc_packaging) || 50) * this.print_quantity;
-                        
-                        // 5. Plating & Impression (Base setup for printing)
-                        total += (parseFloat(r.calc_interior_plating) || 4500) * Math.ceil(this.estimated_pages / 16);
-                        total += (parseFloat(r.calc_cover_plating) || 14000);
                     }
-                    
+
+                    let bindingSelect = document.getElementById('binding-select');
+                    if (bindingSelect) {
+                        for (let i = 0; i < bindingSelect.options.length; i++) {
+                            let opt = bindingSelect.options[i];
+                            let label = isNgn ? opt.getAttribute('data-ngn') : opt.getAttribute('data-usd');
+                            if (label) {
+                                opt.text = label;
+                                opt.textContent = label;
+                            }
+                        }
+                    }
+                },
+
+                // Triage Logic
+                get isTraditional() {
+                    let g = (this.genre || '').toLowerCase();
+                    let isNonFiction = g.includes('non') || g.includes('biography') || g.includes('memoir') || g.includes('academic') || g.includes('business');
+                    let isHighPotentialFiction = !isNonFiction && (g.includes('fiction') || g.includes('sci-fi') || g.includes('fantasy'));
+
+                    let age = parseInt(this.authorAge, 10);
+                    let isUnder35 = !isNaN(age) && age > 0 && age < 35;
+                    let isSenior = !isNaN(age) && age >= 50;
+
+                    // 1. Strict Osisi Hybrid: Age >= 50 and Non-Fiction
+                    if (isSenior && isNonFiction) {
+                        return false;
+                    }
+
+                    // 2. Platform audience or established track record routes to Traditional
+                    if (this.hasSocialPresence || this.isEstablishedAuthor) {
+                        return true;
+                    }
+
+                    // 3. Breakout young talent (<35) writing high-potential fiction
+                    if (isHighPotentialFiction && isUnder35) {
+                        return true;
+                    }
+
+                    // All other submissions (including non-fiction without existing platform) route to Osisi Hybrid
+                    return false;
+                },
+
+                get triageExplanation() {
+                    if (this.isTraditional) {
+                        return 'Pre-qualified for Traditional Board Acquisition evaluation.';
+                    }
+                    if (this.authorAge >= 50) {
+                        return 'Classified under the Osisi Hybrid model (demographic & non-fiction specialization).';
+                    }
+                    return 'Classified under the Osisi Hybrid publishing & print distribution pipeline.';
+                },
+
+                get wordsPerPage() {
+                    if (this.trimSize === 'five_by_eight') return 300;
+                    if (this.trimSize === 'seven_by_ten') return 400;
+                    return 350; // six_by_nine default
+                },
+
+                get cleanWordCount() {
+                    let n = parseInt(this.wordCount, 10);
+                    return isNaN(n) || n < 1 ? 0 : n;
+                },
+
+                get estimatedPages() {
+                    let w = Math.max(500, this.cleanWordCount);
+                    return Math.max(40, Math.ceil(w / this.wordsPerPage));
+                },
+
+                get genreRateUsd() {
+                    let g = (this.genre || '').toLowerCase();
+                    if (g.includes('academic') || g.includes('business')) return 0.018;
+                    if (g.includes('sci-fi') || g.includes('fantasy')) return 0.015;
+                    if (g.includes('biography') || g.includes('memoir')) return 0.014;
+                    if (g.includes('non')) return 0.012;
+                    return 0.010; // Fiction default
+                },
+
+                get genreWordFeeUsd() {
+                    return this.cleanWordCount * this.genreRateUsd;
+                },
+
+                get genreRateLabel() {
+                    if (this.currency === 'NGN') {
+                        let ngnRate = (this.genreRateUsd * this.exchangeRate).toFixed(2);
+                        return '₦' + Number(ngnRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '/w';
+                    }
+                    return '$' + this.genreRateUsd.toFixed(3) + '/w';
+                },
+
+                get totalEditorialFeeUsd() {
+                    let total = 150.00; // Base Operations Fee
+                    total += this.genreWordFeeUsd;
+                    if (this.includeProofreading) total += this.cleanWordCount * 0.005;
+                    if (this.includeCoverDesign) total += 300.00;
+                    if (this.includeMarketingPackage) total += 500.00;
                     return total;
+                },
+
+                get unitPrintCostUsd() {
+                    let isHard = (this.bindingType === 'hardcover');
+                    let base = isHard ? 6.00 : 2.50;
+                    let perPage = isHard ? 0.022 : 0.015;
+                    return base + (this.estimatedPages * perPage);
+                },
+
+                get cleanPrintQuantity() {
+                    let n = parseInt(this.printQuantity, 10);
+                    return isNaN(n) || n < 500 ? 500 : n;
+                },
+
+                get totalBulkPrintUsd() {
+                    return this.unitPrintCostUsd * this.cleanPrintQuantity;
+                },
+
+                get grandTotalUsd() {
+                    return this.totalEditorialFeeUsd + this.totalBulkPrintUsd;
+                },
+
+                formatCurrency(usdAmount) {
+                    let val = Number(usdAmount);
+                    if (isNaN(val)) val = 0;
+                    if (this.currency === 'NGN') {
+                        let ngn = val * (this.exchangeRate || 1500);
+                        return '₦' + ngn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    }
+                    return '$' + val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 }
-            }));
-        });
+            }
+        }
     </script>
 </body>
 

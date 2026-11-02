@@ -80,7 +80,7 @@
                                             </td>
                                             <td class="tb-tnx-amount">
                                                 <div class="tb-tnx-total">
-                                                    <span class="amount text-success fw-bold">₦{{ number_format($prospect->estimated_cost, 0) }}</span>
+                                                    <span class="amount text-success fw-bold">{{ $prospect->currency_symbol }}{{ number_format($prospect->estimated_cost, 0) }}</span>
                                                 </div>
                                                 <div class="tb-tnx-status mt-2">
                                                     @if($prospect->status == 'prospect')

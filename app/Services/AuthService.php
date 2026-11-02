@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Setting;
+use App\Models\AuditLog;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -26,6 +27,10 @@ class AuthService
 
             if (!$otpEnabled) {
                 Auth::login($user);
+                AuditLog::record('auth_login', $user, [
+                    'email' => $user->email,
+                    'method' => 'direct_password',
+                ], $user->id);
                 return ['status' => 'authenticated', 'user' => $user];
             }
 
@@ -38,8 +43,17 @@ class AuthService
             // Send OTP Email
             Mail::to($user->email)->send(new OTPMailable($otp));
 
+            AuditLog::record('auth_otp_sent', $user, [
+                'email' => $user->email,
+            ], $user->id);
+
             return ['status' => 'otp_required', 'user_id' => $user->id];
         }
+
+        AuditLog::record('auth_failed_login', null, [
+            'email' => $credentials['email'],
+            'reason' => 'Invalid email or password credentials',
+        ]);
 
         return ['status' => 'failed'];
     }
@@ -59,8 +73,19 @@ class AuthService
 
             // Login
             Auth::login($user);
+
+            AuditLog::record('auth_login', $user, [
+                'email' => $user->email,
+                'method' => '2fa_otp',
+            ], $user->id);
+
             return true;
         }
+
+        AuditLog::record('auth_failed_otp', $user, [
+            'user_id' => $userId,
+            'reason' => 'Invalid or expired OTP',
+        ], $userId);
 
         return false;
     }
@@ -139,17 +164,28 @@ class AuthService
 
     /**
      * Determine the redirect route based on user role.
+     * Maps the 8 blueprint roles to their respective dashboards.
      */
     public function getRedirectRoute(User $user): string
     {
-        if ($user->hasRole('admin') || $user->hasRole('acquisitions')) {
+        if ($user->hasRole('admin')) {
             return route('admin.dashboard');
+        } elseif ($user->hasRole('it')) {
+            return url('/dashboard/it');
         } elseif ($user->hasRole('finance')) {
-            return route('admin.invoices.index');
+            return url('/dashboard/finance');
+        } elseif ($user->hasRole('acquisition_admin') || $user->hasRole('acquisitions')) {
+            return url('/dashboard/acquisition');
         } elseif ($user->hasRole('editorial')) {
-            return route('admin.projects.index');
-        } elseif ($user->hasRole('prospect')) {
-            return route('author.dashboard');
+            return url('/dashboard/editorial');
+        } elseif ($user->hasRole('design')) {
+            return url('/dashboard/design');
+        } elseif ($user->hasRole('marketing')) {
+            return url('/dashboard/marketing');
+        } elseif ($user->hasRole('print_distribution')) {
+            return url('/dashboard/distribution');
+        } elseif ($user->hasRole('author_agent') || $user->hasRole('prospect')) {
+            return url('/portal/author');
         }
 
         return route('admin.dashboard');

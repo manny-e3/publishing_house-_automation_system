@@ -91,33 +91,33 @@
                                                     Publishing Setup & Manuscript Processing
                                                     <span class="d-block text-soft small">Project: '{{ $invoice->prospect->book_title ?? 'Untitled' }}'</span>
                                                 </td>
-                                                <td>₦{{ number_format($invoice->amount, 2) }}</td>
+                                                <td>{{ $invoice->currency_symbol }}{{ number_format($invoice->amount, 2) }}</td>
                                                 <td>1</td>
-                                                <td>₦{{ number_format($invoice->amount, 2) }}</td>
+                                                <td>{{ $invoice->currency_symbol }}{{ number_format($invoice->amount, 2) }}</td>
                                             </tr>
                                         </tbody>
                                         <tfoot>
                                             <tr>
                                                 <td colspan="2"></td>
                                                 <td>Subtotal</td>
-                                                <td>₦{{ number_format($invoice->amount, 2) }}</td>
+                                                <td>{{ $invoice->currency_symbol }}{{ number_format($invoice->amount, 2) }}</td>
                                             </tr>
                                             @if($invoice->is_installment)
                                             <tr>
                                                 <td colspan="2"></td>
                                                 <td class="text-info">Total Paid (Installments)</td>
-                                                <td class="text-info">₦{{ number_format($invoice->total_paid, 2) }}</td>
+                                                <td class="text-info">{{ $invoice->currency_symbol }}{{ number_format($invoice->total_paid, 2) }}</td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2"></td>
                                                 <td class="text-danger">Balance Due</td>
-                                                <td class="text-danger fw-bold">₦{{ number_format($invoice->amount - $invoice->total_paid, 2) }}</td>
+                                                <td class="text-danger fw-bold">{{ $invoice->currency_symbol }}{{ number_format($invoice->amount - $invoice->total_paid, 2) }}</td>
                                             </tr>
                                             @endif
                                             <tr>
                                                 <td colspan="2"></td>
                                                 <td>Grand Total</td>
-                                                <td><strong>₦{{ number_format($invoice->amount, 2) }}</strong></td>
+                                                <td><strong>{{ $invoice->currency_symbol }}{{ number_format($invoice->amount, 2) }}</strong></td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -133,18 +133,22 @@
                                                 $selectedGateways = $invoice->allowed_gateways ?? ['bank_transfer']; 
                                             @endphp
                                             
-                                            @if(in_array('paystack', $selectedGateways))
-                                            <a href="{{ route('payments.initiate', ['invoice' => $invoice->id, 'gateway' => 'paystack']) }}" class="btn btn-primary"><em class="icon ni ni-cc-alt"></em><span>Pay with Paystack</span></a>
-                                            @endif
-                                            
-                                            @if(in_array('flutterwave', $selectedGateways))
-                                            <a href="{{ route('payments.initiate', ['invoice' => $invoice->id, 'gateway' => 'flutterwave']) }}" class="btn btn-info"><em class="icon ni ni-cc-new"></em><span>Pay with Flutterwave</span></a>
-                                        @endif
-                                            
-                                            @if(in_array('bank_transfer', $selectedGateways))
-                                            <button type="button" class="btn btn-outline-light d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#bankTransferModal">
-                                                <em class="icon ni ni-building"></em><span>Bank Transfer</span>
-                                            </button>
+                                            @if($invoice->currency === 'USD')
+                                                <a href="{{ route('payments.initiate', ['invoice' => $invoice->id, 'gateway' => 'stripe']) }}" class="btn btn-dark"><em class="icon ni ni-cc-alt"></em><span>Pay with Stripe (USD)</span></a>
+                                            @else
+                                                @if(in_array('paystack', $selectedGateways))
+                                                <a href="{{ route('payments.initiate', ['invoice' => $invoice->id, 'gateway' => 'paystack']) }}" class="btn btn-primary"><em class="icon ni ni-cc-alt"></em><span>Pay with Paystack</span></a>
+                                                @endif
+                                                
+                                                @if(in_array('flutterwave', $selectedGateways))
+                                                <a href="{{ route('payments.initiate', ['invoice' => $invoice->id, 'gateway' => 'flutterwave']) }}" class="btn btn-info"><em class="icon ni ni-cc-new"></em><span>Pay with Flutterwave</span></a>
+                                                @endif
+                                                
+                                                @if(in_array('bank_transfer', $selectedGateways))
+                                                <button type="button" class="btn btn-outline-light d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#bankTransferModal">
+                                                    <em class="icon ni ni-building"></em><span>Bank Transfer</span>
+                                                </button>
+                                                @endif
                                             @endif
                                         </div>
                                     </div>
@@ -172,7 +176,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Please make a transfer of <strong>₦{{ number_format($invoice->amount, 2) }}</strong> to the account below:</p>
+                <p>Please make a transfer of <strong>{{ $invoice->currency_symbol }}{{ number_format($invoice->amount, 2) }}</strong> to the account below:</p>
                 <div class="card card-bordered bg-lighter">
                     <div class="card-inner">
                         <div class="d-flex justify-content-between mb-2">

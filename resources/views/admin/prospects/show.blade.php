@@ -60,7 +60,7 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <span class="sub-text">Estimated Investment</span>
-                                                    <span class="lead-text text-success font-bold">₦{{ number_format($prospect->estimated_cost, 2) }}</span>
+                                                    <span class="lead-text text-success font-bold">{{ $prospect->currency_symbol }}{{ number_format($prospect->estimated_cost, 2) }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-12">

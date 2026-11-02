@@ -7,3 +7,6 @@ use Illuminate\Support\Facades\Schedule;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+// Prompt 6: Hourly Abandoned Cart Recovery Scheduler
+Schedule::command('app:recovery-scheduler')->hourly();

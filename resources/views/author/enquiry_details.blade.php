@@ -78,7 +78,7 @@
                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
                     {{ $prospect->project ? 'Project Investment' : 'Investment Summary' }}
                 </h3>
-                <p class="text-3xl font-serif font-bold mb-2">₦{{ number_format($prospect->estimated_cost, 2) }}</p>
+                <p class="text-3xl font-serif font-bold mb-2">{{ $prospect->currency_symbol }}{{ number_format($prospect->estimated_cost, 2) }}</p>
                 <p class="text-xs text-gray-400 leading-relaxed mb-6">Estimated production cost based on your current selection of editing, design, and formatting services.</p>
                 
                 @if($prospect->project)
@@ -96,11 +96,11 @@
                             <div class="p-3 bg-navy-900 rounded-sm">
                                 <div class="flex justify-between text-[10px] mb-1">
                                     <span class="text-gray-400">Paid to date</span>
-                                    <span class="text-white">₦{{ number_format($latestPaidInvoice->total_paid, 2) }}</span>
+                                    <span class="text-white">{{ $latestPaidInvoice->currency_symbol }}{{ number_format($latestPaidInvoice->total_paid, 2) }}</span>
                                 </div>
                                 <div class="flex justify-between text-[10px]">
                                     <span class="text-gray-400">Balance</span>
-                                    <span class="text-red-400">₦{{ number_format($latestPaidInvoice->amount - $latestPaidInvoice->total_paid, 2) }}</span>
+                                    <span class="text-red-400">{{ $latestPaidInvoice->currency_symbol }}{{ number_format($latestPaidInvoice->amount - $latestPaidInvoice->total_paid, 2) }}</span>
                                 </div>
                             </div>
                             

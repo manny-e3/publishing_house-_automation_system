@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    ],
+
+    'cron' => [
+        'key' => env('CRON_SECRET_KEY', 'osisi-secret-recovery-key'),
+    ],
+
 ];

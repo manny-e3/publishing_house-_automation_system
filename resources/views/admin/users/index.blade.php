@@ -10,7 +10,7 @@
                         <div class="nk-block-head-content">
                             <h3 class="nk-block-title page-title">User Management</h3>
                             <div class="nk-block-des text-soft">
-                                <p>Manage platform users and their assigned roles.</p>
+                                <p>Manage platform users, roles, and review individual activity timelines.</p>
                             </div>
                         </div>
                         <div class="nk-block-head-content">
@@ -54,7 +54,11 @@
                                                     <span>{{ strtoupper(substr($user->name, 0, 2)) }}</span>
                                                 </div>
                                                 <div class="user-info">
-                                                    <span class="tb-lead">{{ $user->name }}</span>
+                                                    <span class="tb-lead">
+                                                        <a href="{{ route('admin.users.activity', $user->id) }}" class="text-dark">
+                                                            {{ $user->name }}
+                                                        </a>
+                                                    </span>
                                                     <span>{{ $user->email }}</span>
                                                 </div>
                                             </div>
@@ -74,6 +78,7 @@
                                                         <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
                                                         <div class="dropdown-menu dropdown-menu-end">
                                                             <ul class="link-list-opt no-bdr">
+                                                                <li><a href="{{ route('admin.users.activity', $user->id) }}"><em class="icon ni ni-history"></em><span>View Activity</span></a></li>
                                                                 <li><a href="{{ route('admin.users.edit', $user->id) }}"><em class="icon ni ni-edit"></em><span>Edit</span></a></li>
                                                                 @if($user->id !== auth()->id())
                                                                 <li>

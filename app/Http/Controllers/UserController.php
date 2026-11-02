@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\AuditLog;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -37,7 +38,13 @@ class UserController extends Controller
             'role' => ['required', 'exists:roles,name'],
         ]);
 
-        $this->userService->createUser($data);
+        $user = $this->userService->createUser($data);
+
+        AuditLog::record('user_created', $user, [
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'role' => $data['role'],
+        ]);
 
         return redirect()->route('admin.users.index')->with('success', 'User created successfully and login details sent.');
     }
@@ -65,15 +72,48 @@ class UserController extends Controller
 
         $this->userService->updateUser($user, $data);
 
+        AuditLog::record('user_updated', $user, [
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'role' => $data['role'],
+        ]);
+
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user)
     {
         if ($this->userService->deleteUser($user, auth()->id())) {
+            AuditLog::record('user_deleted', null, [
+                'deleted_user_id' => $user->id,
+                'deleted_user_name' => $user->name,
+                'deleted_user_email' => $user->email,
+            ]);
+
             return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
         }
         
         return redirect()->back()->with('error', 'You cannot delete yourself.');
+    }
+
+    /**
+     * Display a specific user's complete audit trail and activity timeline.
+     */
+    public function activity(User $user)
+    {
+        $activities = AuditLog::where('user_id', $user->id)
+            ->latest()
+            ->paginate(25);
+
+        $loginCount = AuditLog::where('user_id', $user->id)
+            ->where('action', 'auth_login')
+            ->count();
+
+        $lastLogin = AuditLog::where('user_id', $user->id)
+            ->where('action', 'auth_login')
+            ->latest()
+            ->first();
+
+        return view('admin.users.activity', compact('user', 'activities', 'loginCount', 'lastLogin'));
     }
 }

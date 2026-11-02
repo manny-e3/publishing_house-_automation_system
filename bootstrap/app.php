@@ -14,12 +14,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->validateCsrfTokens(except: [
             '/api/webhooks/*',
+            '/api/webhooks/payment',
+            '/api/cron/*',
         ]);
 
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'role.guard' => \App\Http\Middleware\RoleDashboardGuard::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

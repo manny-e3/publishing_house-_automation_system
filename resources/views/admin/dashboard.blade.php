@@ -200,16 +200,22 @@
                                                         <div class="card-title">
                                                             <h6 class="title">Recent Activities</h6>
                                                         </div>
+                                                        <div class="card-tools">
+                                                            <a href="{{ route('admin.audit_logs.index') }}" class="link">View All</a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <ul class="nk-activity">
                                                     @forelse($recentActivities as $activity)
                                                     <li class="nk-activity-item">
-                                                        <div class="nk-activity-media user-avatar bg-primary-dim">
-                                                            {{ strtoupper(substr($activity->user->name ?? 'S', 0, 2)) }}
+                                                        <div class="nk-activity-media user-avatar sm {{ $activity->badge_class }}">
+                                                            <em class="icon ni {{ $activity->icon }}"></em>
                                                         </div>
                                                         <div class="nk-activity-data">
-                                                            <div class="label">{{ $activity->action }} {{ class_basename($activity->model_type) }}</div>
+                                                            <div class="label">
+                                                                <span class="fw-bold">{{ $activity->human_action }}</span>
+                                                                <small class="text-muted d-block">{{ $activity->target_title }}</small>
+                                                            </div>
                                                             <span class="time">{{ $activity->created_at->diffForHumans() }}</span>
                                                         </div>
                                                     </li>

@@ -72,7 +72,7 @@
                     Preserving the tactile elegance of physical books while pioneering the next generation of digital literary experiences. A sanctuary for thought, beautifully bound.
                 </p>
                 <div class="flex flex-wrap gap-4">
-                    <a href="#enquiry-form" class="bg-brand-dark text-white px-8 py-4 text-[10px] uppercase tracking-widest font-bold hover:bg-gray-800 transition-colors">Explore the Archive</a>
+                    <a href="{{ route('enquiry.index') }}" class="bg-brand-dark text-white px-8 py-4 text-[10px] uppercase tracking-widest font-bold hover:bg-gray-800 transition-colors">Submit Manuscript</a>
                     <a href="#" class="border border-gray-200 px-8 py-4 text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-gray-900 transition-colors">Latest Publications &rarr;</a>
                 </div>
             </div>

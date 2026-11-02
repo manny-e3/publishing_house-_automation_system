@@ -59,10 +59,9 @@ class InvoiceController extends Controller
         return view('admin.invoices.show', compact('invoice'));
     }
 
-    public function downloadPDF(Invoice $invoice)
+    public function downloadPDF(Invoice $invoice, \App\Services\SystemInvoicePdfService $pdfService)
     {
-        $pdf = Pdf::loadView('admin.invoices.pdf', compact('invoice'));
-        return $pdf->download($invoice->invoice_number . '.pdf');
+        return $pdfService->download($invoice);
     }
 
     public function showReceipt(Invoice $invoice)
@@ -119,6 +118,14 @@ class InvoiceController extends Controller
         
         // Use the PaymentService logic to ensure consistency across automated and manual payments
         $this->paymentService->finalizePayment($invoice, $reference);
+
+        \App\Models\AuditLog::record('payment_confirmed_manual', $invoice, [
+            'invoice_number' => $invoice->invoice_number,
+            'reference' => $reference,
+            'amount' => $invoice->total_amount,
+            'currency' => $invoice->currency,
+            'confirmed_by' => auth()->user()?->name ?? 'Admin',
+        ]);
 
         return redirect()->route('admin.invoices.index')->with('success', 'Payment confirmed! The Project is now active in the Pipeline.');
     }

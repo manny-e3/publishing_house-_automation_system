@@ -65,7 +65,7 @@
                                             </td>
                                             <td class="tb-tnx-amount">
                                                 <div class="tb-tnx-total">
-                                                    <span class="amount">₦{{ number_format($tx->amount, 2) }}</span>
+                                                    <span class="amount">{{ $tx->currency_symbol ?? $tx->invoice?->currency_symbol ?? '₦' }}{{ number_format($tx->amount, 2) }}</span>
                                                 </div>
                                                 <div class="tb-tnx-status">
                                                     @if($tx->status == 'successful')

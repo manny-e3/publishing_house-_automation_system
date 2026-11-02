@@ -93,7 +93,7 @@
                                             </td>
                                             <td class="tb-odr-amount">
                                                 <span class="tb-odr-total">
-                                                    <span class="amount">₦{{ number_format($invoice->amount, 2) }}</span>
+                                                    <span class="amount">{{ $invoice->currency_symbol }}{{ number_format($invoice->amount, 2) }}</span>
                                                 </span>
                                                 <span class="tb-odr-status">
                                                     @if($invoice->status == 'paid')
@@ -102,7 +102,7 @@
                                                         @endphp
                                                         @if($isPartial)
                                                             <span class="badge badge-dot bg-info">Partially Paid</span>
-                                                            <div class="text-soft smaller">Paid: ₦{{ number_format($invoice->total_paid, 2) }} / ₦{{ number_format($invoice->amount, 2) }}</div>
+                                                            <div class="text-soft smaller">Paid: {{ $invoice->currency_symbol }}{{ number_format($invoice->total_paid, 2) }} / {{ $invoice->currency_symbol }}{{ number_format($invoice->amount, 2) }}</div>
                                                         @else
                                                             <span class="badge badge-dot bg-success">Paid</span>
                                                         @endif

@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\LogsAudit;
 
 class Contract extends Model
 {
+    use LogsAudit;
+
     protected $fillable = [
         'project_id',
         'prospect_id',

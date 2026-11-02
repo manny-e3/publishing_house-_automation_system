@@ -59,6 +59,10 @@
                                                     <span class="sub-text">Ref:</span>
                                                     <span class="fw-bold text-primary">{{ $invoice->payment_reference }}</span>
                                                 </div>
+                                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                                    <span class="sub-text">Currency:</span>
+                                                    <span class="badge bg-outline-dark">{{ $invoice->currency }}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -69,7 +73,7 @@
                                         <thead class="bg-light">
                                             <tr>
                                                 <th>Description</th>
-                                                <th class="text-end">Amount Paid</th>
+                                                <th class="text-end">Amount Paid ({{ $invoice->currency }})</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -82,17 +86,17 @@
                                                     @endif
                                                 </td>
                                                 <td class="text-end fw-bold text-dark">
-                                                    ₦{{ number_format($invoice->is_installment ? $invoice->total_paid : $invoice->amount, 2) }}
+                                                    {{ $invoice->currency_symbol }}{{ number_format($invoice->is_installment ? $invoice->total_paid : $invoice->amount, 2) }}
                                                 </td>
                                             </tr>
                                             @if($invoice->is_installment)
                                             <tr class="bg-lighter">
                                                 <td class="text-end text-soft small">Total Invoice Amount</td>
-                                                <td class="text-end text-soft small">₦{{ number_format($invoice->amount, 2) }}</td>
+                                                <td class="text-end text-soft small">{{ $invoice->currency_symbol }}{{ number_format($invoice->amount, 2) }}</td>
                                             </tr>
                                             <tr>
                                                 <td class="text-end fw-bold">Balance Outstanding</td>
-                                                <td class="text-end fw-bold text-danger">₦{{ number_format($invoice->amount - $invoice->total_paid, 2) }}</td>
+                                                <td class="text-end fw-bold text-danger">{{ $invoice->currency_symbol }}{{ number_format($invoice->amount - $invoice->total_paid, 2) }}</td>
                                             </tr>
                                             @endif
                                         </tbody>

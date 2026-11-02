@@ -52,7 +52,7 @@
 
                         <div class="flex flex-col items-start sm:items-end w-full sm:w-auto">
                             <div class="text-right w-full mb-3 text-lg font-bold text-gray-900">
-                                ₦{{ number_format($invoice->amount, 2) }}
+                                {{ $invoice->currency_symbol }}{{ number_format($invoice->amount, 2) }}
                             </div>
                             @if($invoice->status !== 'paid')
                             <div class="flex gap-2 w-full sm:w-auto justify-end">

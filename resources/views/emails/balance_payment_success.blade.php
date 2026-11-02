@@ -20,7 +20,7 @@ Payment Confirmation
     </tr>
     <tr>
         <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: bold;">Amount Applied</td>
-        <td style="padding: 10px; border: 1px solid #e2e8f0;">₦{{ number_format($invoice->total_paid, 2) }}</td>
+        <td style="padding: 10px; border: 1px solid #e2e8f0;">{{ $invoice->currency_symbol }}{{ number_format($invoice->total_paid, 2) }} ({{ $invoice->currency }})</td>
     </tr>
 </table>
 

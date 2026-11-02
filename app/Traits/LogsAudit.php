@@ -4,7 +4,6 @@ namespace App\Traits;
 
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
 
 trait LogsAudit
 {
@@ -25,21 +24,50 @@ trait LogsAudit
 
     protected static function logAction($model, $action)
     {
+        $sensitive = ['password', 'remember_token', 'otp', 'otp_expires_at'];
+
         $changes = [];
         if ($action === 'updated') {
+            $dirty = $model->getDirty();
+            
+            // Mask or omit sensitive fields
+            foreach ($sensitive as $s) {
+                if (isset($dirty[$s])) {
+                    $dirty[$s] = '***REDACTED***';
+                }
+            }
+
+            // Don't log if only timestamps changed
+            if (empty(array_diff(array_keys($dirty), ['updated_at']))) {
+                return;
+            }
+
+            $original = $model->getOriginal();
+            foreach ($sensitive as $s) {
+                if (isset($original[$s])) {
+                    $original[$s] = '***REDACTED***';
+                }
+            }
+
             $changes = [
-                'before' => array_intersect_key($model->getOriginal(), $model->getDirty()),
-                'after' => $model->getDirty(),
+                'before' => array_intersect_key($original, $dirty),
+                'after' => $dirty,
             ];
+        } elseif ($action === 'created') {
+            $attrs = $model->getAttributes();
+            foreach ($sensitive as $s) {
+                if (isset($attrs[$s])) {
+                    $attrs[$s] = '***REDACTED***';
+                }
+            }
+            $changes = ['attributes' => $attrs];
         }
 
-        AuditLog::create([
-            'user_id' => Auth::id(),
-            'action' => $action . ' ' . strtolower(class_basename($model)),
-            'model_type' => get_class($model),
-            'model_id' => $model->id,
-            'changes' => $changes,
-            'ip_address' => Request::ip(),
-        ]);
+        AuditLog::record(
+            action: $action . ' ' . strtolower(class_basename($model)),
+            model: $model,
+            changes: $changes,
+            userId: Auth::id()
+        );
     }
 }

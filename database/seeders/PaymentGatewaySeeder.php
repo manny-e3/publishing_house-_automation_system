@@ -14,8 +14,18 @@ class PaymentGatewaySeeder extends Seeder
                 'name' => 'Paystack',
                 'slug' => 'paystack',
                 'config' => [
-                    'public_key' => '',
-                    'secret_key' => '',
+                    'public_key' => env('PAYSTACK_PUBLIC_KEY', ''),
+                    'secret_key' => env('PAYSTACK_SECRET_KEY', ''),
+                ],
+                'is_active' => true
+            ],
+            [
+                'name' => 'Stripe',
+                'slug' => 'stripe',
+                'config' => [
+                    'public_key' => env('STRIPE_KEY', ''),
+                    'secret_key' => env('STRIPE_SECRET', ''),
+                    'webhook_secret' => env('STRIPE_WEBHOOK_SECRET', ''),
                 ],
                 'is_active' => true
             ],

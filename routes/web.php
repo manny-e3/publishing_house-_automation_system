@@ -12,6 +12,14 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorDashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\Dashboard\ItDashboardController;
+use App\Http\Controllers\Dashboard\FinanceDashboardController;
+use App\Http\Controllers\Dashboard\AcquisitionDashboardController;
+use App\Http\Controllers\Dashboard\EditorialDashboardController;
+use App\Http\Controllers\Dashboard\DesignDashboardController;
+use App\Http\Controllers\Dashboard\MarketingDashboardController;
+use App\Http\Controllers\Dashboard\DistributionDashboardController;
+use App\Http\Controllers\Dashboard\AuthorPortalController;
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -29,12 +37,15 @@ Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 
 Route::get('/enquiry', [EnquiryController::class, 'enquiry'])->name('enquiry.index');
+Route::post('/enquiry', [EnquiryController::class, 'store'])->name('enquiry.store');
+Route::get('/enquiry/confirmed/{prospect}', [EnquiryController::class, 'confirmed'])->name('enquiry.confirmed');
+Route::post('/enquiry/calculate', [EnquiryController::class, 'calculateQuote'])->name('enquiry.calculate');
 
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
-Route::post('/', [EnquiryController::class, 'store'])->name('enquiry.store');
+Route::post('/', [EnquiryController::class, 'store']);
 
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
@@ -64,7 +75,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/contracts', [\App\Http\Controllers\Admin\ContractController::class, 'index'])->name('contracts.index');
     Route::get('/contracts/{contract}/download', [\App\Http\Controllers\Admin\ContractController::class, 'download'])->name('contracts.download');
 
-    // Access Control
+    // Audit & Activity Logs
+    Route::get('/audit-logs', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('audit_logs.index');
+    Route::get('/audit-logs/export', [\App\Http\Controllers\Admin\AuditLogController::class, 'export'])->name('audit_logs.export');
+    Route::get('/audit-logs/{auditLog}', [\App\Http\Controllers\Admin\AuditLogController::class, 'show'])->name('audit_logs.show');
+
+    // Access Control & User Activity
+    Route::get('/users/{user}/activity', [UserController::class, 'activity'])->name('users.activity');
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class)->except(['show', 'create']);
 
@@ -110,4 +127,70 @@ Route::group(['prefix' => 'author', 'as' => 'author.', 'middleware' => ['auth']]
     Route::get('/contracts/{contract}', [\App\Http\Controllers\ContractController::class, 'show'])->name('contracts.show');
     Route::post('/contracts/{contract}/sign', [\App\Http\Controllers\ContractController::class, 'sign'])->name('contracts.sign');
 });
+
+// =========================================================================
+// Phase 4: Back-Office Team Dashboards & Strict Business Gates (Prompts 3, 7, 8, 9)
+// Protected by Auth & RoleDashboardGuard Middleware
+// =========================================================================
+Route::middleware(['auth', \App\Http\Middleware\RoleDashboardGuard::class])->group(function () {
+    // IT Dashboard
+    Route::prefix('dashboard/it')->name('dashboard.it.')->group(function () {
+        Route::get('/', [ItDashboardController::class, 'index'])->name('index');
+        Route::post('/flags/{flag}/toggle', [ItDashboardController::class, 'toggleFlag'])->name('flags.toggle');
+        Route::post('/ghost-files/flush', [ItDashboardController::class, 'flushGhostFiles'])->name('ghost.flush');
+    });
+
+    // Finance Dashboard
+    Route::prefix('dashboard/finance')->name('dashboard.finance.')->group(function () {
+        Route::get('/', [FinanceDashboardController::class, 'index'])->name('index');
+    });
+
+    // Acquisition Dashboard
+    Route::prefix('dashboard/acquisition')->name('dashboard.acquisition.')->group(function () {
+        Route::get('/', [AcquisitionDashboardController::class, 'index'])->name('index');
+        Route::get('/{prospect}', [AcquisitionDashboardController::class, 'show'])->name('show');
+        Route::post('/{prospect}/toggle-task', [AcquisitionDashboardController::class, 'toggleTask'])->name('task.toggle');
+        Route::post('/{prospect}/assign-isbn', [AcquisitionDashboardController::class, 'assignIsbn'])->name('isbn.assign');
+    });
+
+    // Editorial Dashboard
+    Route::prefix('dashboard/editorial')->name('dashboard.editorial.')->group(function () {
+        Route::get('/', [EditorialDashboardController::class, 'index'])->name('index');
+        Route::get('/{prospect}', [EditorialDashboardController::class, 'show'])->name('show');
+        Route::post('/{prospect}/toggle-task', [EditorialDashboardController::class, 'toggleTask'])->name('task.toggle');
+        Route::post('/{prospect}/rate', [EditorialDashboardController::class, 'updateRating'])->name('rate');
+    });
+
+    // Design Dashboard
+    Route::prefix('dashboard/design')->name('dashboard.design.')->group(function () {
+        Route::get('/', [DesignDashboardController::class, 'index'])->name('index');
+        Route::get('/{prospect}', [DesignDashboardController::class, 'show'])->name('show');
+        Route::post('/{prospect}/upload-asset', [DesignDashboardController::class, 'uploadAsset'])->name('asset.upload');
+        Route::post('/{prospect}/phase', [DesignDashboardController::class, 'updatePhase'])->name('phase.update');
+        Route::post('/{prospect}/annotate', [DesignDashboardController::class, 'addAnnotation'])->name('annotate');
+        Route::post('/{prospect}/acknowledge-regression', [DesignDashboardController::class, 'acknowledgeRegression'])->name('regression.acknowledge');
+    });
+
+    // Marketing Dashboard
+    Route::prefix('dashboard/marketing')->name('dashboard.marketing.')->group(function () {
+        Route::get('/', [MarketingDashboardController::class, 'index'])->name('index');
+        Route::post('/{prospect}/toggle-task', [MarketingDashboardController::class, 'toggleCampaignTask'])->name('task.toggle');
+    });
+
+    // Print & Distribution Dashboard
+    Route::prefix('dashboard/distribution')->name('dashboard.distribution.')->group(function () {
+        Route::get('/', [DistributionDashboardController::class, 'index'])->name('index');
+        Route::post('/{prospect}/channel', [DistributionDashboardController::class, 'updateChannel'])->name('channel.update');
+        Route::post('/{prospect}/inventory', [DistributionDashboardController::class, 'addInventory'])->name('inventory.add');
+        Route::post('/{prospect}/validate-release', [DistributionDashboardController::class, 'releaseValidation'])->name('release.validate');
+    });
+
+    // Author Portal
+    Route::prefix('portal/author')->name('portal.author.')->group(function () {
+        Route::get('/', [AuthorPortalController::class, 'index'])->name('index');
+        Route::get('/{prospect}', [AuthorPortalController::class, 'show'])->name('show');
+        Route::post('/{prospect}/feedback', [AuthorPortalController::class, 'postFeedback'])->name('feedback');
+    });
+});
+
 

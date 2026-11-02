@@ -7,6 +7,7 @@ use App\Models\Transaction;
 use App\Models\PaymentGateway;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -48,7 +49,10 @@ class PaymentController extends Controller
      */
     public function callback(Request $request, string $gateway)
     {
-        $reference = $request->query('reference') ?? $request->query('tx_ref') ?? $request->query('transaction_id');
+        $reference = $request->query('reference') 
+            ?? $request->query('tx_ref') 
+            ?? $request->query('transaction_id') 
+            ?? $request->query('session_id');
         
         if (!$reference) {
             return redirect()->route('admin.invoices.index')->with('error', 'Could not verify payment reference.');
@@ -74,9 +78,6 @@ class PaymentController extends Controller
             return redirect()->route('payments.success')->with('success', 'Payment successful!');
         }
 
-        // Ideally, we'd call the gateway API here to verify. 
-        // For now, we trust the callback reference for the sake of development flow,
-        // but we'll mark it as 'successful' if it reached here.
         $this->paymentService->finalizePayment($transaction->invoice, $reference);
         
         $transaction->update([
@@ -95,47 +96,44 @@ class PaymentController extends Controller
     }
 
     /**
-     * Handle automated alerts from Gateway
+     * Unified Webhook Endpoint (Prompt 5)
+     * Handles POST /api/webhooks/payment for Stripe, Paystack, and others
+     */
+    public function handleUnifiedWebhook(Request $request)
+    {
+        try {
+            $result = $this->paymentService->processWebhook($request, null);
+            return response()->json($result, 200);
+        } catch (\Exception $e) {
+            Log::error('Unified Webhook Error: ' . $e->getMessage(), [
+                'headers' => $request->headers->all(),
+                'body' => $request->getContent(),
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
+    /**
+     * Specific Gateway Webhook Endpoint
+     * Handles POST /api/webhooks/{gateway}
      */
     public function webhook(Request $request, string $gateway)
     {
-        if (!$this->paymentService->verifyWebhook($gateway, $request)) {
-            return response()->json(['message' => 'Invalid signature'], 400);
-        }
-
-        $data = $request->all();
-        $invoice = null;
-
-        // Extract Invoice based on Gateway structure
-        if ($gateway == 'paystack' && $data['event'] == 'charge.success') {
-            $invoiceId = $data['data']['metadata']['invoice_id'] ?? null;
-            $invoice = Invoice::find($invoiceId);
-            $paymentRef = $data['data']['reference'];
-        } elseif ($gateway == 'flutterwave' && $data['status'] == 'successful') {
-            $invoiceId = $data['data']['meta']['invoice_id'] ?? null;
-            $invoice = Invoice::find($invoiceId);
-            $paymentRef = $data['data']['tx_ref'];
-        }
-
-        if ($invoice && $invoice->status !== 'paid') {
-            $this->paymentService->finalizePayment($invoice, $paymentRef);
-        }
-
-        // Update Transaction record
-        $transaction = Transaction::where('transaction_reference', $paymentRef)
-            ->orWhere('external_reference', $paymentRef)
-            ->first();
-            
-        if ($transaction) {
-            $isSuccess = ($gateway == 'paystack' && $data['event'] == 'charge.success') || ($gateway == 'flutterwave' && $data['status'] == 'successful');
-            
-            $transaction->update([
-                'status' => $isSuccess ? 'successful' : 'failed',
-                'external_reference' => $paymentRef,
-                'metadata' => $data
+        try {
+            $result = $this->paymentService->processWebhook($request, $gateway);
+            return response()->json($result, 200);
+        } catch (\Exception $e) {
+            Log::error("Webhook error for {$gateway}: " . $e->getMessage(), [
+                'gateway' => $gateway,
+                'body' => $request->getContent(),
             ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 400);
         }
-
-        return response()->json(['message' => 'Webhook Processed']);
     }
 }

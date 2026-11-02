@@ -24,6 +24,26 @@
     </style>
 </head>
 <body>
+    @php
+        $currencySymbol = $invoice->currency_symbol;
+        $currency = $invoice->currency;
+
+        // Detect payment method dynamically
+        $latestTx = $invoice->transactions()->latest()->first();
+        $gateway = $latestTx?->gateway_slug ?? ($invoice->prospect?->payment_merchant ?? '');
+
+        if ($gateway === 'stripe' || str_starts_with($invoice->payment_reference ?? '', 'cs_') || str_contains($invoice->payment_reference ?? '', 'stripe')) {
+            $paymentMethod = 'Stripe Online Checkout (USD)';
+        } elseif ($gateway === 'paystack' || str_contains($invoice->payment_reference ?? '', 'pstk') || str_contains(strtolower($invoice->payment_reference ?? ''), 'paystack')) {
+            $paymentMethod = 'Paystack Online Gateway (NGN)';
+        } elseif ($gateway === 'flutterwave') {
+            $paymentMethod = 'Flutterwave Online (NGN)';
+        } elseif (str_starts_with($invoice->payment_reference ?? '', 'MANUAL-')) {
+            $paymentMethod = 'Manual Bank Transfer / Confirmed by Admin';
+        } else {
+            $paymentMethod = ($currency === 'USD') ? 'Stripe Online Checkout (USD)' : 'Electronic Payment / Bank Transfer';
+        }
+    @endphp
     <div class="receipt-box">
         <div class="header">
             <div class="logo">The Curated Archive</div>
@@ -46,7 +66,7 @@
             </tr>
             <tr>
                 <td class="label">Payment Method</td>
-                <td>Manual Bank Transfer / Confirmed by Admin</td>
+                <td>{{ $paymentMethod }}</td>
             </tr>
         </table>
 
@@ -54,7 +74,7 @@
             <thead>
                 <tr>
                     <th>Description</th>
-                    <th style="text-align: right;">Amount Paid</th>
+                    <th style="text-align: right;">Amount Paid ({{ $currency }})</th>
                 </tr>
             </thead>
             <tbody>
@@ -64,13 +84,13 @@
                         <span style="color: #888; font-size: 11px;">Project: {{ $invoice->prospect->book_title }}</span>
                     </td>
                     <td style="text-align: right; font-size: 18px; font-weight: bold;">
-                        ₦{{ number_format($invoice->is_installment ? $invoice->total_paid : $invoice->amount, 2) }}
+                        {{ $currencySymbol }}{{ number_format($invoice->is_installment ? $invoice->total_paid : $invoice->amount, 2) }}
                     </td>
                 </tr>
                 @if($invoice->is_installment)
                 <tr>
-                    <td style="text-align: right; font-size: 11px; color: #888;">Invoice Total: ₦{{ number_format($invoice->amount, 2) }}</td>
-                    <td style="text-align: right; font-size: 11px; color: #d11;">Balance: ₦{{ number_format($invoice->amount - $invoice->total_paid, 2) }}</td>
+                    <td style="text-align: right; font-size: 11px; color: #888;">Invoice Total: {{ $currencySymbol }}{{ number_format($invoice->amount, 2) }}</td>
+                    <td style="text-align: right; font-size: 11px; color: #d11;">Balance: {{ $currencySymbol }}{{ number_format($invoice->amount - $invoice->total_paid, 2) }}</td>
                 </tr>
                 @endif
             </tbody>

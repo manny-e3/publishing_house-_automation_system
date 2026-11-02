@@ -47,9 +47,9 @@
                                             </td>
                                             <td class="tb-odr-amount">
                                                 <span class="tb-odr-total">
-                                                    <span class="amount">₦{{ number_format($invoice->is_installment ? $invoice->total_paid : $invoice->amount, 2) }}</span>
+                                                    <span class="amount">{{ $invoice->currency_symbol }}{{ number_format($invoice->is_installment ? $invoice->total_paid : $invoice->amount, 2) }}</span>
                                                     @if($invoice->is_installment)
-                                                        <div class="smaller text-soft">of ₦{{ number_format($invoice->amount, 2) }}</div>
+                                                        <div class="smaller text-soft">of {{ $invoice->currency_symbol }}{{ number_format($invoice->amount, 2) }}</div>
                                                     @endif
                                                 </span>
                                             </td>
