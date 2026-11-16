@@ -22,7 +22,7 @@ class AuthorAcknowledgment extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Manuscript Received: ' . $this->prospect->book_title,
+            subject: 'Manuscript Excerpt Received: ' . $this->prospect->book_title . ' — Griots Lounge Publishing',
         );
     }
 

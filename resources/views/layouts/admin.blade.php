@@ -4,7 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>@yield('title', 'Admin Dashboard') | The Curated Archive</title>
+    <title>@yield('title', 'Staff Console') | Griots Lounge Publishing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Jost:ital,wght@0,300..700;1,300..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/css/dashlite.css') }}">
     <link id="skin-default" rel="stylesheet" href="{{ asset('assets/css/theme.css') }}">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -19,7 +22,7 @@
                 <div class="nk-sidebar-element nk-sidebar-head">
                     <div class="nk-sidebar-brand">
                         <a href="{{ route('admin.dashboard') }}" class="logo-link nk-sidebar-logo">
-                            <span class="text-white font-bold" style="font-size:1.25rem; font-family: serif;">Curated Archive</span>
+                            <span class="text-white font-bold" style="font-size:1.35rem; font-family: 'EB Garamond', Georgia, serif; letter-spacing: -0.01em;">Griots Lounge</span>
                         </a>
                     </div>
                     <div class="nk-menu-trigger ms-auto me-n2">
@@ -215,7 +218,7 @@
                             </div>
                             <div class="nk-header-brand d-xl-none">
                                 <a href="{{ route('admin.dashboard') }}" class="logo-link">
-                                    <span class="font-bold text-lg">Curated Archive</span>
+                                    <span class="font-bold text-lg font-serif">Griots Lounge</span>
                                 </a>
                             </div>
                             <div class="nk-header-tools">
@@ -273,7 +276,7 @@
                 <div class="nk-footer">
                     <div class="container-fluid">
                         <div class="nk-footer-wrap">
-                            <div class="nk-footer-copyright"> &copy; {{ date('Y') }} The Curated Archive.</div>
+                            <div class="nk-footer-copyright"> &copy; {{ date('Y') }} Griots Lounge Publishing (Nigeria & Canada).</div>
                         </div>
                     </div>
                 </div>
@@ -286,6 +289,7 @@
     <script src="{{ asset('assets/js/bundle.js') }}"></script>
     <script src="{{ asset('assets/js/scripts.js') }}"></script>
     <script src="{{ asset('assets/js/charts/gd-default.js') }}"></script>
+    <script src="{{ asset('assets/js/form-submit-spinner.js') }}"></script>
 
     @if(session('success'))
     <script>

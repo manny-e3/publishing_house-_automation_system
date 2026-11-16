@@ -32,32 +32,38 @@ class ProspectService
      */
     public function submitEnquiry(array $data, string $ipAddress): Prospect
     {
-        // 1. Handle File Uploads
-        $filePath = $data['manuscript_file']->store('manuscripts', 'local');
+        // 1. Handle File Uploads (Excerpt & Optional Cover Idea)
+        $uploadedFile = $data['excerpt_file'] ?? $data['manuscript_file'] ?? null;
+        $filePath = $uploadedFile ? $uploadedFile->store('manuscripts', 'local') : null;
         $coverDesignPath = isset($data['cover_design_file']) 
             ? $data['cover_design_file']->store('cover_designs', 'local') 
             : null;
 
-        // 2. Perform Automated Triage
+        // 2. Publishing Option Selection & Pathway
+        $publishingOption = $data['publishing_option'] ?? 'hybrid'; // hybrid, traditional, advise_me
+
         $authorAge = isset($data['author_age']) ? (int) $data['author_age'] : null;
         $hasSocialPresence = !empty($data['has_social_presence']);
         $isEstablished = !empty($data['is_established_author']);
         $genre = $data['genre'] ?? 'Fiction';
 
-        $determinedModel = $this->triageService->determinePublishingModel(
-            $authorAge,
-            $genre,
-            $hasSocialPresence,
-            $isEstablished
-        );
-
-        $triageReason = $this->triageService->getDeterminationReason(
-            $determinedModel,
-            $authorAge,
-            $genre,
-            $hasSocialPresence,
-            $isEstablished
-        );
+        // Set determined model based on author preference
+        if ($publishingOption === 'traditional') {
+            $determinedModel = PublishingModel::Traditional;
+            $triageReason = 'Author submitted directly for Traditional Publishing evaluation.';
+        } elseif ($publishingOption === 'hybrid') {
+            $determinedModel = PublishingModel::HybridOsisi;
+            $triageReason = 'Author selected Griots Lounge Hybrid Publishing pipeline.';
+        } else {
+            // "advise_me": Editorial triage recommendation
+            $determinedModel = $this->triageService->determinePublishingModel(
+                $authorAge,
+                $genre,
+                $hasSocialPresence,
+                $isEstablished
+            );
+            $triageReason = 'Author requested Griots Lounge Editorial Advisory to determine optimal pathway.';
+        }
 
         // 3. Calculate Pricing Metrics
         $currency = strtoupper($data['currency'] ?? 'NGN');
@@ -68,7 +74,7 @@ class ProspectService
             'include_proofreading' => !empty($data['include_proofreading']) || (isset($data['services']) && in_array('proofreading', $data['services'])),
             'include_cover_design' => !empty($data['include_cover_design']) || (isset($data['services']) && in_array('cover', $data['services'])),
             'include_marketing_package' => !empty($data['include_marketing_package']) || (isset($data['services']) && in_array('marketing', $data['services'])),
-            'trim_size' => $data['trim_size'] ?? 'six_by_nine',
+            'trim_size' => $data['trim_size'] ?? 'five_half_by_eight_half',
             'binding_type' => !empty($data['is_hard_cover']) ? 'hardcover' : ($data['binding_type'] ?? 'paperback'),
             'print_quantity' => (int) ($data['print_quantity'] ?? 500),
         ]);
@@ -79,8 +85,8 @@ class ProspectService
         $totalCalculatedFee = $isTraditional ? 0.00 : $quoteBreakdown['active']['total_editorial_fee'];
         $totalBulkPrint = $isTraditional ? 0.00 : $quoteBreakdown['active']['total_bulk_print_estimate'];
         $grandTotal = $isTraditional ? 0.00 : $quoteBreakdown['active']['total_project_cost'];
-        $status = $isTraditional ? WorkflowStatus::Submitted->value : WorkflowStatus::LeadCaptured->value;
-        $paymentStatus = $isTraditional ? 'paid' : 'unpaid';
+        $status = WorkflowStatus::Submitted->value;
+        $paymentStatus = 'unpaid';
         $paymentMerchant = $quoteBreakdown['payment_merchant'];
 
         // 4. Create Prospect / Manuscript Record
@@ -90,8 +96,19 @@ class ProspectService
             'email' => $data['email'],
             'phone_number' => $data['phone_number'],
             
+            // Expanded Author Profile (Google Form Alignment)
+            'author_bio' => $data['author_bio'] ?? null,
+            'pen_name' => $data['pen_name'] ?? null,
+            'author_location' => $data['author_location'] ?? null,
+            'prior_publications' => $data['prior_publications'] ?? null,
+            'social_links' => $data['social_links'] ?? null,
+
+            // Expanded Book Profile
             'book_title' => $data['book_title'],
             'genre' => $genre,
+            'synopsis' => $data['synopsis'] ?? null,
+            'target_audience' => $data['target_audience'] ?? null,
+            'comparable_titles' => $data['comparable_titles'] ?? null,
             'stage_of_manuscript' => $data['stage_of_manuscript'] ?? 'completed',
             'number_of_words' => (int) ($data['number_of_words'] ?? 0),
             'quote_for_services' => $data['services'] ?? [],
@@ -101,6 +118,7 @@ class ProspectService
             'author_age' => $authorAge,
             'has_social_presence' => $hasSocialPresence,
             'is_established_author' => $isEstablished,
+            'publishing_option' => $publishingOption,
             'determined_model' => $determinedModel->value,
             'status' => $status,
             'design_phase' => DesignStatus::Queued->value,
@@ -116,6 +134,7 @@ class ProspectService
 
             // File Uploads
             'manuscript_file_path' => $filePath,
+            'excerpt_file_path' => $filePath,
             'cover_design_path' => $coverDesignPath,
             
             // Financial Metrics
@@ -125,26 +144,47 @@ class ProspectService
             'payment_merchant' => $paymentMerchant,
             'payment_status' => $paymentStatus,
 
-            // Legal Agreement & Metadata
+            // Legal Agreement & Marketing Consent
             'agreement_name' => $data['agreement_name'],
             'agreement_terms' => true,
+            'marketing_opt_in' => !empty($data['marketing_opt_in']),
             'ip_address' => $ipAddress,
             'checklist_progress' => [],
             'metadata_file' => [
                 'triage_reason' => $triageReason,
+                'publishing_option' => $publishingOption,
                 'pricing_quote' => $quoteBreakdown,
                 'ip_address' => $ipAddress,
                 'submission_timestamp' => now()->toIso8601String(),
             ]
         ]);
 
-        // 5. Generate & Auto-Sign Submission Agreement
+        // 5. Ingest to Marketing Subscribers if consented
+        if (!empty($data['marketing_opt_in'])) {
+            try {
+                \App\Models\MarketingSubscriber::updateOrCreate(
+                    ['email' => $data['email']],
+                    [
+                        'name' => $data['name'],
+                        'phone_number' => $data['phone_number'],
+                        'source' => 'enquiry',
+                        'preferred_genre' => $genre,
+                        'ip_address' => $ipAddress,
+                        'subscribed_at' => now(),
+                    ]
+                );
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Marketing subscriber ingest error: ' . $e->getMessage());
+            }
+        }
+
+        // 6. Generate & Auto-Sign Submission Agreement
         $this->contractService->generateSubmissionContract($prospect, [
             'name' => $data['agreement_name'],
             'ip' => $ipAddress
         ]);
 
-        // 6. Dispatch Event
+        // 7. Dispatch Event
         event(new ProspectSubmitted($prospect));
 
         return $prospect;

@@ -15,7 +15,7 @@
 <body>
     <div class="header">
         <div class="title">Submission Agreement</div>
-        <div>The Curated Archive Publishing House</div>
+        <div>Griots Lounge Publishing</div>
     </div>
 
     <div class="section">
@@ -26,7 +26,7 @@
 
     <div class="section">
         <div class="section-title">1. Confidentiality</div>
-        <p>We acknowledge that the manuscript submitted is the intellectual property of the Author and is confidential. The Curated Archive will not reproduce, distribute, or disclose the contents of the manuscript to third parties without the Author's explicit consent, except for internal evaluation purposes.</p>
+        <p>We acknowledge that the manuscript submitted is the intellectual property of the Author and is confidential. Griots Lounge Publishing will not reproduce, distribute, or disclose the contents of the manuscript to third parties without the Author's explicit consent, except for internal evaluation purposes.</p>
     </div>
 
     <div class="section">
@@ -48,7 +48,7 @@
     </div>
 
     <div class="footer">
-        © {{ date('Y') }} The Curated Archive Publishing House. All rights reserved.
+        © {{ date('Y') }} Griots Lounge Publishing (Nigeria & Canada). All rights reserved.
     </div>
 </body>
 </html>

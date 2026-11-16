@@ -156,21 +156,57 @@
                     </div>
                 </div>
 
-                <!-- Raw File Download Card -->
-                <div class="card card-bordered">
+                <!-- Manuscript Excerpt & Assets Access Card -->
+                <div class="card card-bordered mb-4">
                     <div class="card-inner">
-                        <h6 class="title mb-2">Raw Manuscript Access</h6>
-                        @if($prospect->manuscript_file_path)
-                            <a href="{{ asset('storage/' . $prospect->manuscript_file_path) }}" class="btn btn-outline-primary w-100" target="_blank">
-                                <em class="icon ni ni-file-docs"></em> Open Raw Document
+                        <h6 class="title mb-2">Manuscript Excerpt & Submission Assets</h6>
+                        @if($prospect->manuscript_file_path || $prospect->excerpt_file_path)
+                            <a href="{{ route('dashboard.editorial.download_manuscript', $prospect->id) }}" class="btn btn-primary w-100 mb-2">
+                                <em class="icon ni ni-download-cloud"></em> Download 3,000-Word Excerpt
                             </a>
                         @else
-                            <div class="alert alert-light text-center small text-muted">
-                                No raw document uploaded.
+                            <div class="alert alert-light text-center small text-muted mb-2">
+                                No excerpt document uploaded.
                             </div>
+                        @endif
+
+                        @if($prospect->cover_design_path)
+                            <a href="{{ route('dashboard.editorial.download_cover', $prospect->id) }}" class="btn btn-outline-secondary w-100">
+                                <em class="icon ni ni-img"></em> Download Cover Concept
+                            </a>
                         @endif
                     </div>
                 </div>
+
+                <!-- Synopsis & Pitch Reading Deck (Point 19) -->
+                @if($prospect->synopsis)
+                <div class="card card-bordered mb-4">
+                    <div class="card-inner">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="title mb-0">Book Synopsis</h6>
+                            <span class="badge bg-light text-dark">{{ $prospect->genre }}</span>
+                        </div>
+                        <div class="bg-light p-3 rounded text-dark small" style="max-height: 250px; overflow-y: auto; white-space: pre-wrap;">
+                            {{ $prospect->synopsis }}
+                        </div>
+                        @if($prospect->target_audience)
+                            <div class="mt-2 text-muted small"><strong>Target Audience:</strong> {{ $prospect->target_audience }}</div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
+                @if($prospect->author_bio)
+                <div class="card card-bordered mb-4">
+                    <div class="card-inner">
+                        <h6 class="title mb-2">About the Author</h6>
+                        <p class="small text-muted mb-1">{{ $prospect->author_bio }}</p>
+                        @if($prospect->author_location)
+                            <span class="badge bg-outline-secondary small"><em class="icon ni ni-map-pin"></em> {{ $prospect->author_location }}</span>
+                        @endif
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
         </div>

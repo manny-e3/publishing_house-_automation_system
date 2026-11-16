@@ -44,6 +44,42 @@ class AuthorDashboardController extends Controller
         return view('author.enquiry_details', compact('prospect'));
     }
 
+    public function downloadManuscript(Prospect $prospect)
+    {
+        $user = Auth::user();
+        if (!$this->projectService->authorizeAuthor($prospect, $user->id, $user->email)) {
+            abort(403, 'Unauthorized access to manuscript document.');
+        }
+
+        $path = $prospect->excerpt_file_path ?: $prospect->manuscript_file_path;
+        if (!$path || !\Illuminate\Support\Facades\Storage::disk('local')->exists($path)) {
+            abort(404, 'Manuscript document not found.');
+        }
+
+        $ext = pathinfo($path, PATHINFO_EXTENSION) ?: 'docx';
+        $filename = \Illuminate\Support\Str::slug($prospect->book_title ?: 'manuscript') . '_excerpt.' . $ext;
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($path, $filename);
+    }
+
+    public function downloadCover(Prospect $prospect)
+    {
+        $user = Auth::user();
+        if (!$this->projectService->authorizeAuthor($prospect, $user->id, $user->email)) {
+            abort(403, 'Unauthorized access to cover file.');
+        }
+
+        $path = $prospect->cover_design_path;
+        if (!$path || !\Illuminate\Support\Facades\Storage::disk('local')->exists($path)) {
+            abort(404, 'Cover file not found.');
+        }
+
+        $ext = pathinfo($path, PATHINFO_EXTENSION) ?: 'jpg';
+        $filename = \Illuminate\Support\Str::slug($prospect->book_title ?: 'cover') . '_concept.' . $ext;
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($path, $filename);
+    }
+
     public function createEnquiry()
     {
         $rates = \App\Models\PricingRate::all()->pluck('value', 'key');

@@ -25,6 +25,16 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    public function showAdminLogin()
+    {
+        return view('auth.admin_login');
+    }
+
+    public function adminLogin(Request $request)
+    {
+        return $this->login($request);
+    }
+
     public function login(Request $request)
     {
         $credentials = $request->validate([

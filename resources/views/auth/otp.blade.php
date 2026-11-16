@@ -7,9 +7,10 @@
     <!-- Visual Side -->
     <div class="auth-split-visual">
         <div class="auth-split-content">
-            <h1 class="brand-logo-text font-serif">The Archive</h1>
-            <p class="fs-18px italic font-serif mb-4">"Verification is the seal of authenticity in a world of variables."</p>
-            <div style="width: 40px; background: #eab308; height: 4px;"></div>
+            <span class="badge bg-white-10 text-white text-uppercase tracking-widest fs-11px mb-3">Pan-African Literary House &bull; Est. 2012</span>
+            <h1 class="brand-logo-text font-serif text-white">Griots Lounge</h1>
+            <p class="fs-18px italic font-serif mb-4 text-white-50">"Preserving narratives, celebrating culture, amplifying diverse stories."</p>
+            <div style="width: 48px; height: 4px; background: #96BBA4; border-radius: 2px;"></div>
         </div>
     </div>
 
@@ -43,9 +44,9 @@
                 </div>
 
                 <div class="form-group pt-2">
-                    <button type="submit" class="btn btn-lg btn-primary btn-block">
+                    <button type="submit" class="btn btn-lg btn-primary btn-block w-100" data-loading-text="Verifying Code...">
                         <span>Verify & Continue</span>
-                        <em class="icon ni ni-shield-check"></em>
+                        <em class="icon ni ni-shield-check ms-1"></em>
                     </button>
                 </div>
             </form>
@@ -54,7 +55,7 @@
                 Didn't get the code? <br>
                 <form id="resend-form" action="{{ route('otp.resend') }}" method="POST" style="display: inline;">
                     @csrf
-                    <button type="submit" id="resend-btn" class="btn btn-link link link-primary fw-bold p-0" style="color: #8a6d3b !important; text-decoration: none;" disabled>
+                    <button type="submit" id="resend-btn" class="btn btn-link link link-primary fw-bold p-0" style="text-decoration: none;" disabled>
                         Resend Code <span id="countdown-timer">(60s)</span>
                     </button>
                 </form>

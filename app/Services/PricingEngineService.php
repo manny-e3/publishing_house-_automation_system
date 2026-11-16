@@ -54,12 +54,11 @@ class PricingEngineService
      * Easily expandable for future alternative layouts.
      */
     public const TRIM_SIZE_SPECS = [
-        'five_by_eight' => ['label' => '5x8 Pocket', 'words_per_page' => 300],
-        'six_by_nine' => ['label' => '6x9 Trade Paperback', 'words_per_page' => 350],
-        'seven_by_ten' => ['label' => '7x10 Executive', 'words_per_page' => 400],
-        // Future extensions can be appended here:
-        // 'eight_by_ten' => ['label' => '8x10 Illustrated', 'words_per_page' => 450],
-        // 'landscape_photo' => ['label' => 'Landscape Art/Photo', 'words_per_page' => 180],
+        'five_by_eight' => ['label' => '5" x 8" Pocket / Poetry / Novella', 'words_per_page' => 300, 'cost_multiplier' => 1.0],
+        'five_half_by_eight_half' => ['label' => '5.5" x 8.5" Standard Fiction / Digest', 'words_per_page' => 320, 'cost_multiplier' => 1.05],
+        'six_by_nine' => ['label' => '6" x 9" Trade Paperback / Non-Fiction', 'words_per_page' => 350, 'cost_multiplier' => 1.15],
+        'quarto' => ['label' => 'Quarto / 8" x 10" Illustrated & Children\'s', 'words_per_page' => 450, 'cost_multiplier' => 1.45],
+        'seven_by_ten' => ['label' => '7" x 10" Executive / Academic', 'words_per_page' => 400, 'cost_multiplier' => 1.25],
     ];
 
     /**
@@ -138,9 +137,11 @@ class PricingEngineService
         // Manufacturing base formula:
         // Paperback: $2.50 base + ($pages * $0.015)
         // Hardcover: $6.00 base + ($pages * $0.022)
-        $perBookUnitPrintCostUsd = $isHardcover 
+        // Scaled by trim size surface/paper multiplier
+        $trimMultiplier = self::TRIM_SIZE_SPECS[$trimKey]['cost_multiplier'] ?? 1.0;
+        $perBookUnitPrintCostUsd = ($isHardcover 
             ? (6.00 + ($estimatedPages * 0.022))
-            : (2.50 + ($estimatedPages * 0.015));
+            : (2.50 + ($estimatedPages * 0.015))) * $trimMultiplier;
 
         $totalBulkPrintUsd = $perBookUnitPrintCostUsd * $printQty;
 

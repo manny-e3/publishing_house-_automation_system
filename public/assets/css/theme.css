@@ -1,8 +1,459 @@
 /*!
- * Theme Name: Default
- * Package : DashLite
- * Author: Softnio
- * Author URI: http://themeforest.net/user/softnio
- * Version	 :	1.0.0
- * Updated	 :	07.23.2020
-**/
+ * Theme: Griots Lounge Publishing Canada Theme
+ * Canonical Identity Aligned with https://griotslounge.ca/
+ * Primary: #00382B (Deep Forest Emerald) | Accent: #96BBA4 (Eucalyptus Sage) | CTA: #009688 (Teal) | Dark: #131313 | Canvas: #FCFCFC
+ **/
+
+:root {
+  --bs-primary: #00382B;
+  --bs-primary-rgb: 0, 56, 43;
+  --primary: #00382B;
+  --primary-hover: #00241C;
+  --brand-dark: #131313;
+  --brand-emerald: #00382B;
+  --brand-sage: #96BBA4;
+  --brand-teal: #009688;
+  --brand-bg: #FCFCFC;
+  --brand-linen: #FDF7F2;
+  --font-serif: 'EB Garamond', 'Playfair Display', Georgia, serif;
+  --font-sans: 'Jost', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ========================================================
+   1. Typography & Global Body Background
+   ======================================================== */
+body {
+  font-family: var(--font-sans);
+}
+
+body.has-sidebar,
+.nk-body.bg-lighter,
+.bg-lighter {
+  background-color: #FCFCFC !important;
+}
+
+.font-serif,
+.nk-sidebar-brand .text-white,
+.brand-logo-text,
+.nk-block-title {
+  font-family: var(--font-serif);
+}
+
+/* ========================================================
+   2. Dark Sidebar (Deep Forest Charcoal #002920 / #131313)
+   ======================================================== */
+.nk-sidebar.is-dark {
+  background: #00241C !important;
+  border-right-color: #00382B !important;
+}
+
+.is-dark .nk-sidebar-head {
+  border-color: #00382B !important;
+}
+
+.is-dark .nk-sidebar-brand span {
+  color: #FFFFFF !important;
+  font-family: var(--font-serif);
+  letter-spacing: -0.01em;
+}
+
+.nk-sidebar.is-dark .user-balance-alt {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.is-dark .nk-menu-link {
+  color: #B2C4BD;
+}
+
+.is-dark .nk-menu-icon {
+  color: #96BBA4;
+}
+
+.is-dark .nk-menu-badge {
+  color: #FFFFFF;
+  background: #009688;
+}
+
+.is-dark .nk-menu-heading .overline-title,
+.is-dark .overline-title.text-primary-alt {
+  color: #96BBA4 !important;
+  letter-spacing: 0.12em;
+}
+
+.is-dark .nk-menu-sub .active > .nk-menu-link,
+.is-dark .nk-menu-link:hover,
+.is-dark .active > .nk-menu-link,
+.is-dark .nk-menu-link:hover .nk-menu-icon,
+.is-dark .nk-menu-item.active > .nk-menu-link .nk-menu-icon,
+.is-dark .nk-menu-item.current-menu > .nk-menu-link .nk-menu-icon {
+  color: #FFFFFF !important;
+}
+
+.is-dark .nk-menu-item.active > .nk-menu-link,
+.is-dark .nk-menu-item.current-menu > .nk-menu-link {
+  background: rgba(150, 187, 164, 0.12) !important;
+}
+
+.is-dark .nk-menu-sub .nk-menu-link:hover {
+  color: #96BBA4 !important;
+}
+
+.is-dark .user-name,
+.is-dark .nk-news-text p {
+  color: #C8D8D1;
+}
+
+.is-dark .nk-quick-nav-icon {
+  color: #B2C4BD;
+}
+
+.is-dark .nk-quick-nav-icon:hover {
+  color: #96BBA4;
+}
+
+/* ========================================================
+   3. Top Header Bar & Footer
+   ======================================================== */
+.nk-header {
+  background: #FFFFFF !important;
+  border-bottom-color: #E2ECE7 !important;
+}
+
+.nk-header.is-light {
+  background: #FFFFFF !important;
+  border-bottom-color: #E2ECE7 !important;
+}
+
+.nk-footer {
+  background: #FFFFFF;
+  border-top: 1px solid #E2ECE7;
+}
+
+.nk-footer-copyright a {
+  color: #00382B;
+  font-weight: 600;
+}
+
+.nk-footer-copyright a:hover {
+  color: #009688;
+}
+
+/* ========================================================
+   4. Primary Colors (Deep Forest Emerald #00382B)
+   ======================================================== */
+.text-primary,
+.link-primary,
+a.text-primary {
+  color: #00382B !important;
+}
+
+a:hover,
+.link-primary:hover,
+a.text-primary:hover,
+a.text-primary:focus {
+  color: #009688 !important;
+}
+
+.border-primary {
+  border-color: #00382B !important;
+}
+
+.bg-primary {
+  background-color: #00382B !important;
+  color: #FFFFFF !important;
+}
+
+a.bg-primary:hover,
+a.bg-primary:focus,
+button.bg-primary:hover,
+button.bg-primary:focus {
+  background-color: #00241C !important;
+}
+
+.bg-primary-dim {
+  background-color: #EBF3EF !important;
+  color: #00382B !important;
+}
+
+.text-primary-dim {
+  color: #EBF3EF !important;
+}
+
+.user-avatar.bg-primary,
+.user-avatar[class*=-primary] {
+  background-color: #00382B !important;
+}
+
+.badge-primary {
+  background-color: #00382B !important;
+  color: #FFFFFF;
+}
+
+.badge-dim.bg-primary {
+  background-color: #EBF3EF !important;
+  border-color: #D1E3DA !important;
+  color: #00382B !important;
+}
+
+.badge-dot.bg-primary {
+  background: transparent !important;
+  color: #00382B;
+}
+
+.badge-dot.bg-primary:after {
+  background-color: #00382B !important;
+}
+
+.alert-fill.alert-primary {
+  background-color: #00382B !important;
+  border-color: #00382B !important;
+}
+
+.alert-primary {
+  background-color: #EBF3EF;
+  border-color: #D1E3DA;
+  color: #00382B;
+}
+
+/* ========================================================
+   5. Buttons (Primary Emerald & Outlines)
+   ======================================================== */
+.btn-primary {
+  background-color: #00382B !important;
+  border-color: #00382B !important;
+  color: #FFFFFF !important;
+}
+
+.btn-primary:hover {
+  background-color: #00241C !important;
+  border-color: #00241C !important;
+  color: #FFFFFF !important;
+}
+
+.btn-primary:focus,
+.btn-primary.focus {
+  background-color: #00241C !important;
+  border-color: #00241C !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 56, 43, 0.25) !important;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
+  background-color: #001A14 !important;
+  border-color: #001A14 !important;
+}
+
+.btn-primary.btn-dim {
+  color: #00382B !important;
+  background-color: #EBF3EF !important;
+  border-color: #D1E3DA !important;
+}
+
+.btn-primary.btn-dim:hover {
+  color: #FFFFFF !important;
+  background-color: #00382B !important;
+  border-color: #00382B !important;
+}
+
+.btn-outline-primary {
+  border-color: #00382B !important;
+  color: #00382B !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: #00382B !important;
+  border-color: #00382B !important;
+  color: #FFFFFF !important;
+}
+
+.btn-dim.btn-outline-primary {
+  color: #00382B !important;
+  background-color: #EBF3EF !important;
+  border-color: #D1E3DA !important;
+}
+
+.btn-dim.btn-outline-primary:hover {
+  color: #FFFFFF !important;
+  background-color: #00382B !important;
+  border-color: #00382B !important;
+}
+
+/* ========================================================
+   6. Navigation Tabs, Links, & Indicators
+   ======================================================== */
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.active .nav-link {
+  color: #00382B !important;
+  border-bottom-color: #00382B !important;
+}
+
+.nav-tabs .nav-link:after {
+  background: #00382B !important;
+}
+
+.progress-bar,
+.dot-primary,
+.icon-circle {
+  background-color: #00382B !important;
+}
+
+.page-item.active .page-link {
+  background-color: #00382B !important;
+  border-color: #00382B !important;
+  color: #FFFFFF !important;
+}
+
+.page-link:hover {
+  color: #00382B;
+}
+
+.link-list-menu li.active > a,
+.link-list-menu a.active,
+.link-list-menu a:hover {
+  color: #00382B !important;
+}
+
+.link-list-menu li.active > a .icon,
+.link-list-menu a.active .icon,
+.link-list-menu a:hover .icon {
+  color: #00382B !important;
+}
+
+/* ========================================================
+   7. Form Controls, Focus States & Radios/Checkboxes
+   ======================================================== */
+.form-control:focus,
+.form-control.focus,
+.custom-file-input:focus ~ .custom-file-label,
+.select2-container--default .select2-selection--single:focus,
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+  border-color: #00382B !important;
+  box-shadow: 0 0 0 3px rgba(0, 56, 43, 0.16) !important;
+}
+
+.custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-input:not(:disabled):active ~ .custom-control-label::before {
+  background-color: #00382B !important;
+  border-color: #00382B !important;
+}
+
+.custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
+  border-color: #00382B !important;
+  box-shadow: 0 0 0 3px rgba(0, 56, 43, 0.16) !important;
+}
+
+/* ========================================================
+   8. Cards & Borders (Refined Crisp Styling)
+   ======================================================== */
+.card {
+  border-color: #E2ECE7 !important;
+}
+
+.card-bordered {
+  border-color: #E2ECE7 !important;
+}
+
+.card-inner,
+.card-inner-group .card-inner {
+  border-color: #E2ECE7 !important;
+}
+
+.nk-tb-item:not(.nk-tb-head):hover {
+  background: #F4F8F6 !important;
+}
+
+/* ========================================================
+   9. Eucalyptus Sage & Teal Accents (#96BBA4 / #009688)
+   ======================================================== */
+.text-sage,
+.link-sage {
+  color: #96BBA4 !important;
+}
+
+.text-teal,
+.link-teal {
+  color: #009688 !important;
+}
+
+.badge-info,
+.badge-secondary {
+  background-color: #96BBA4 !important;
+  color: #00241C !important;
+}
+
+.badge-dim.bg-info {
+  background-color: #EBF3EF !important;
+  border-color: #D1E3DA !important;
+  color: #00382B !important;
+}
+
+.btn-secondary {
+  background-color: #96BBA4 !important;
+  border-color: #96BBA4 !important;
+  color: #00241C !important;
+}
+
+.btn-secondary:hover {
+  background-color: #82A891 !important;
+  border-color: #82A891 !important;
+  color: #00241C !important;
+}
+
+/* Amber / Warning for notices */
+.text-warning,
+.link-warning {
+  color: #D9822B !important;
+}
+
+.badge-warning {
+  background-color: #D9822B !important;
+  color: #FFFFFF !important;
+}
+
+.badge-dim.bg-warning {
+  background-color: #FCF6EE !important;
+  border-color: #F8E2C8 !important;
+  color: #D9822B !important;
+}
+
+.btn-warning {
+  background-color: #D9822B !important;
+  border-color: #D9822B !important;
+  color: #FFFFFF !important;
+}
+
+.btn-warning:hover {
+  background-color: #B86B1D !important;
+  border-color: #B86B1D !important;
+}
+
+/* ========================================================
+   10. Form Submit Spinners & Loading States
+   ======================================================== */
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+}
+
+.spinner-border {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  vertical-align: -0.125em;
+  border: 0.16em solid currentColor;
+  border-right-color: transparent !important;
+  border-radius: 50%;
+  animation: 0.75s linear infinite spinner-border;
+}
+
+.spinner-border-sm {
+  width: 0.95rem;
+  height: 0.95rem;
+  border-width: 0.15em;
+}
+
+@keyframes spinner-border {
+  to { transform: rotate(360deg); }
+}

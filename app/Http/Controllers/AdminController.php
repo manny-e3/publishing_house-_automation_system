@@ -61,4 +61,30 @@ class AdminController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Estimate updated successfully.']);
     }
+
+    public function downloadManuscript(Prospect $prospect)
+    {
+        $path = $prospect->excerpt_file_path ?: $prospect->manuscript_file_path;
+        if (!$path || !\Illuminate\Support\Facades\Storage::disk('local')->exists($path)) {
+            abort(404, 'Submitted manuscript or excerpt file was not found.');
+        }
+
+        $ext = pathinfo($path, PATHINFO_EXTENSION) ?: 'docx';
+        $filename = \Illuminate\Support\Str::slug($prospect->book_title ?: 'manuscript') . '_excerpt.' . $ext;
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($path, $filename);
+    }
+
+    public function downloadCover(Prospect $prospect)
+    {
+        $path = $prospect->cover_design_path;
+        if (!$path || !\Illuminate\Support\Facades\Storage::disk('local')->exists($path)) {
+            abort(404, 'Cover concept file was not found.');
+        }
+
+        $ext = pathinfo($path, PATHINFO_EXTENSION) ?: 'jpg';
+        $filename = \Illuminate\Support\Str::slug($prospect->book_title ?: 'cover') . '_concept.' . $ext;
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($path, $filename);
+    }
 }

@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>@yield('title', 'My Publishing Enquiries') | The Archive</title>
+    <title>@yield('title', 'My Publishing Enquiries') | Griots Lounge Publishing</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Jost:ital,wght@0,300..700;1,300..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,32 +18,48 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
+                        sans: ['"Jost"', 'Inter', 'sans-serif'],
+                        serif: ['"EB Garamond"', 'Georgia', 'serif'],
                     },
                     colors: {
-                        navy: {
-                            800: '#1e293b',
-                            900: '#0f172a',
-                            950: '#020617',
+                        brand: {
+                            dark: '#131313',
+                            emerald: '#00382B',
+                            emeraldHover: '#00271E',
+                            sage: '#96BBA4',
+                            sageHover: '#82A891',
+                            teal: '#009688',
+                            tealHover: '#00796B',
+                            terracotta: '#00382B', // Backward compatible alias
+                            terracottaHover: '#00271E',
+                            accent: '#96BBA4',
+                            accentHover: '#82A891',
+                            surface: '#FFFFFF',
+                            bg: '#FCFCFC',
+                            linen: '#FDF7F2'
                         },
-                        gold: '#A67C00',
+                        navy: {
+                            800: '#131313',
+                            900: '#0D0D0D',
+                            950: '#00241C',
+                        },
+                        gold: '#D9822B',
                     }
                 }
             }
         }
     </script>
     <style>
-        .sidebar { background-color: #ffffff; border-right: 1px solid #f3f4f6; }
-        .sidebar-item-active { background-color: #f3f4f6; color: #111827; }
+        .sidebar { background-color: #ffffff; border-right: 1px solid #E2ECE7; }
+        .sidebar-item-active { background-color: #EBF3EF; color: #00382B; font-weight: 600; }
         .status-badge { @apply px-3 py-1 rounded-full text-xs font-semibold; }
         .status-under-review { background-color: #fef3c7; color: #92400e; }
-        .status-action-required { background-color: #f3f4f6; color: #374151; }
+        .status-action-required { background-color: #EBF3EF; color: #00382B; }
         .status-draft { background-color: #f3f4f6; color: #6b7280; }
     </style>
     @stack('styles')
 </head>
-<body class="bg-[#F9FAFB] text-gray-900 font-sans" x-data="{ mobileNav: false }">
+<body class="bg-brand-bg text-gray-900 font-sans" x-data="{ mobileNav: false }">
     <!-- Mobile Drawer Overlay -->
     <div x-show="mobileNav" 
          x-transition:enter="transition-opacity ease-linear duration-300"
@@ -68,7 +84,7 @@
          style="display: none;">
         <div class="p-6">
             <div class="flex items-center justify-between mb-8">
-                 <span class="font-serif italic text-2xl font-bold">The Archive</span>
+                 <span class="font-serif italic text-2xl font-bold">Griots Lounge</span>
                  <button @click="mobileNav = false" class="p-1 rounded-md text-gray-500 hover:text-gray-900">
                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                  </button>
@@ -104,7 +120,7 @@
         </div>
         
         <div class="mt-auto p-6">
-            <a href="{{ route('author.enquiries.create') }}" class="flex items-center justify-between w-full px-4 py-3 bg-navy-950 text-white rounded-sm text-xs font-bold tracking-widest hover:bg-navy-900 transition-colors">
+            <a href="{{ route('author.enquiries.create') }}" class="flex items-center justify-between w-full px-4 py-3 bg-brand-terracotta text-white rounded-sm text-xs font-bold tracking-widest hover:bg-brand-terracottaHover transition-colors">
                 <span>SUBMIT MANUSCRIPT</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </a>
@@ -116,7 +132,7 @@
         <div class="hidden md:flex w-64 sidebar flex-col flex-shrink-0">
             <div class="p-8">
                 <div class="flex items-center space-x-2 mb-12">
-                     <span class="font-serif italic text-2xl font-bold">The Archive</span>
+                     <span class="font-serif italic text-2xl font-bold">Griots Lounge</span>
                 </div>
                 
                 <div class="mb-4">
@@ -149,7 +165,7 @@
             </div>
             
             <div class="mt-auto p-8">
-                <a href="{{ route('author.enquiries.create') }}" class="flex items-center justify-between w-full px-4 py-3 bg-navy-950 text-white rounded-sm text-xs font-bold tracking-widest hover:bg-navy-900 transition-colors">
+                <a href="{{ route('author.enquiries.create') }}" class="flex items-center justify-between w-full px-4 py-3 bg-brand-terracotta text-white rounded-sm text-xs font-bold tracking-widest hover:bg-brand-terracottaHover transition-colors">
                     <span>SUBMIT MANUSCRIPT</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </a>
@@ -164,14 +180,14 @@
                     <button @click="mobileNav = true" class="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none" aria-label="Open Navigation Menu">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
-                    <span class="md:hidden font-serif italic text-xl font-bold">The Archive</span>
+                    <span class="md:hidden font-serif italic text-xl font-bold">Griots Lounge</span>
                 </div>
                 
                 <div class="flex items-center space-x-4 md:space-x-6 text-gray-500">
                     <a href="{{ route('author.enquiries.create') }}" class="px-3 md:px-4 py-2 border border-gray-200 rounded-sm text-[10px] font-bold tracking-widest uppercase hover:bg-gray-50 transition-colors">New Submission</a>
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
-                        <button type="submit" title="Logout" class="w-9 h-9 md:w-10 md:h-10 bg-navy-950 rounded-full flex items-center justify-center text-white hover:bg-navy-900 transition-colors">
+                        <button type="submit" title="Logout" class="w-9 h-9 md:w-10 md:h-10 bg-brand-dark rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                         </button>
                     </form>
@@ -185,6 +201,7 @@
         </div>
     </div>
 
+    <script src="{{ asset('assets/js/form-submit-spinner.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

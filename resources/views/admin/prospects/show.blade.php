@@ -122,17 +122,17 @@
                                         <h6 class="title text-soft uppercase tracking-wider">Submitted Assets</h6>
                                     </div>
                                     <ul class="d-flex flex-wrap" style="gap: 1rem;">
-                                        @if($prospect->manuscript_file_path)
+                                        @if($prospect->manuscript_file_path || $prospect->excerpt_file_path)
                                         <li>
-                                            <a href="{{ asset('storage/' . $prospect->manuscript_file_path) }}" target="_blank" class="btn btn-outline-primary"><em class="icon ni ni-file-docs"></em><span>Download Excerpt</span></a>
+                                            <a href="{{ route('admin.prospects.download_manuscript', $prospect->id) }}" class="btn btn-outline-primary"><em class="icon ni ni-file-docs"></em><span>Download Excerpt</span></a>
                                         </li>
                                         @endif
                                         @if($prospect->cover_design_path)
                                         <li>
-                                            <a href="{{ asset('storage/' . $prospect->cover_design_path) }}" target="_blank" class="btn btn-outline-secondary"><em class="icon ni ni-img"></em><span>View Cover Idea</span></a>
+                                            <a href="{{ route('admin.prospects.download_cover', $prospect->id) }}" class="btn btn-outline-secondary"><em class="icon ni ni-img"></em><span>Download Cover Idea</span></a>
                                         </li>
                                         @endif
-                                        @if(!$prospect->manuscript_file_path && !$prospect->cover_design_path)
+                                        @if(!$prospect->manuscript_file_path && !$prospect->excerpt_file_path && !$prospect->cover_design_path)
                                         <li><span class="text-soft">No files were uploaded.</span></li>
                                         @endif
                                     </ul>
@@ -169,9 +169,51 @@
                                                 <span class="lead-text text-base">{{ $prospect->agreement_name ?? 'N/A' }}</span>
                                             </div>
                                         </div>
+                                        <div class="col-md-6 text-sm">
+                                            <div class="form-group mb-0">
+                                                <span class="sub-text text-xs uppercase tracking-widest">Pen Name / Location</span>
+                                                <span class="lead-text text-base">{{ $prospect->pen_name ?: 'None' }} ({{ $prospect->author_location ?: 'N/A' }})</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 text-sm">
+                                            <div class="form-group mb-0">
+                                                <span class="sub-text text-xs uppercase tracking-widest">Publishing Pathway</span>
+                                                <span class="badge bg-primary text-uppercase">{{ str_replace('_', ' ', $prospect->publishing_option ?? $prospect->determined_model?->value ?? 'hybrid') }}</span>
+                                            </div>
+                                        </div>
+                                        @if($prospect->author_bio)
                                         <div class="col-12 text-sm border-top pt-2">
                                             <div class="form-group mb-0">
-                                               <span class="sub-text text-xs italic">Submission IP: {{ $prospect->ip_address }}</span>
+                                                <span class="sub-text text-xs uppercase tracking-widest">Author Bio</span>
+                                                <p class="text-dark small mt-1">{{ $prospect->author_bio }}</p>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        @if($prospect->synopsis)
+                                        <div class="col-12 text-sm border-top pt-2">
+                                            <div class="form-group mb-0">
+                                                <span class="sub-text text-xs uppercase tracking-widest">Synopsis / Book Summary</span>
+                                                <div class="bg-light p-3 rounded mt-1 text-dark small" style="white-space: pre-wrap;">{{ $prospect->synopsis }}</div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        @if(!empty($prospect->social_links) && is_array($prospect->social_links))
+                                        <div class="col-12 text-sm border-top pt-2">
+                                            <div class="form-group mb-0">
+                                                <span class="sub-text text-xs uppercase tracking-widest">Author Social Links</span>
+                                                <div class="d-flex flex-wrap gap-2 mt-1">
+                                                    @foreach($prospect->social_links as $network => $url)
+                                                        @if(!empty($url))
+                                                            <a href="{{ $url }}" target="_blank" class="badge bg-light text-dark border"><em class="icon ni ni-globe"></em> {{ ucfirst($network) }}: {{ $url }}</a>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        <div class="col-12 text-sm border-top pt-2">
+                                            <div class="form-group mb-0">
+                                               <span class="sub-text text-xs italic">Submission IP: {{ $prospect->ip_address }} &bull; Marketing Consent: {{ $prospect->marketing_opt_in ? 'Opted In (Subscribed)' : 'No' }}</span>
                                             </div>
                                         </div>
                                     </div>

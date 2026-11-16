@@ -1,15 +1,16 @@
 @extends('layouts.admin-auth')
 
-@section('title', 'Sign In')
+@section('title', 'Author Sign In - Griots Lounge Publishing')
 
 @section('content')
 <div class="auth-split-wrapper">
     <!-- Visual Side -->
     <div class="auth-split-visual">
         <div class="auth-split-content">
-            <h1 class="brand-logo-text font-serif">The Archive</h1>
-            <p class="fs-18px italic font-serif mb-4">"Curating the essence of thought, preserving the elegance of expression."</p>
-            <div style="width: 40px; hieght: 4px; background: #eab308; height: 4px;"></div>
+            <span class="badge bg-white-10 text-white text-uppercase tracking-widest fs-11px mb-3">Pan-African Literary House &bull; Est. 2012</span>
+            <h1 class="brand-logo-text font-serif text-white">Griots Lounge</h1>
+            <p class="fs-18px italic font-serif mb-4 text-white-50">"Preserving narratives, celebrating culture, amplifying diverse stories."</p>
+            <div style="width: 48px; height: 4px; background: #96BBA4; border-radius: 2px;"></div>
         </div>
     </div>
 
@@ -18,8 +19,9 @@
         <div class="auth-form-inner">
             <div class="nk-block-head">
                 <div class="nk-block-head-content">
-                    <h2 class="nk-block-title font-serif">Sign In</h2>
-                    <p class="text-soft fs-15px">Access your curated collections and essays.</p>
+                    <span class="badge bg-light text-muted uppercase tracking-wider mb-2 font-mono">Author Portal</span>
+                    <h2 class="nk-block-title font-serif">Author Sign In</h2>
+                    <p class="text-soft fs-15px">Sign in to track your submissions, review editorial feedback, and view publishing contracts.</p>
                 </div>
             </div>
 
@@ -44,7 +46,7 @@
                 </div>
             @endif
             
-            <form action="{{ route('login.post') }}" method="POST" class="mt-5">
+            <form action="{{ route('login.post') }}" method="POST" class="mt-4">
                 @csrf
                 <div class="form-group mb-4">
                     <label class="form-label">Email Address</label>
@@ -52,7 +54,7 @@
                         <div class="form-icon form-icon-right">
                             <em class="icon ni ni-mail"></em>
                         </div>
-                        <input type="email" name="email" class="form-control form-control-lg" placeholder="Enter your email" value="{{ old('email') }}" required>
+                        <input type="email" name="email" class="form-control form-control-lg" placeholder="author@domain.com" value="{{ old('email') }}" required autofocus>
                     </div>
                     @error('email') <span class="text-danger mt-1 d-block fs-12px">{{ $message }}</span> @enderror
                 </div>
@@ -60,32 +62,33 @@
                 <div class="form-group mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <label class="form-label mb-0">Password</label>
-                        <a href="{{ route('password.request') }}" class="link link-primary fw-bold text-warning" style="color: #8a6d3b !important;">Forgot Password?</a>
+                        <a href="{{ route('password.request') }}" class="link link-primary fw-bold fs-13px">Forgot Password?</a>
                     </div>
                     <div class="form-control-wrap">
-                        <a href="#" class="form-control-icon form-control-icon-right passcode-switch lg" data-target="password">
+                        <a href="javascript:void(0);" class="form-icon form-icon-right passcode-switch lg" data-target="password" aria-label="Toggle password visibility">
                             <em class="passcode-icon icon-show icon ni ni-eye"></em>
                             <em class="passcode-icon icon-hide icon ni ni-eye-off"></em>
                         </a>
-                        <input type="password" name="password" id="password" class="form-control form-control-lg" placeholder="Enter your password" required>
+                        <input type="password" name="password" id="password" class="form-control form-control-lg" placeholder="••••••••" required>
                     </div>
                     @error('password') <span class="text-danger mt-1 d-block fs-12px">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="form-group pt-2">
-                    <button type="submit" class="btn btn-lg btn-primary btn-block">
+                    <button type="submit" class="btn btn-lg btn-primary btn-block w-100" data-loading-text="Signing In...">
                         <span>Sign In</span>
-                        <em class="icon ni ni-arrow-right"></em>
+                        <em class="icon ni ni-arrow-right ms-1"></em>
                     </button>
                 </div>
             </form>
 
-            <div class="divider text-center my-5">
+            <div class="divider text-center my-4">
                 <span class="bg-white px-3 fs-12px text-soft overline-title">OR</span>
             </div>
 
             <div class="text-center">
-                <p class="fs-14px">Don't have an account? <a href="{{ route('register') }}" class="link link-primary fw-bold text-warning" style="color: #8a6d3b !important;">Register Now</a></p>
+                <p class="fs-14px">Don't have an author account? <a href="{{ route('register') }}" class="link link-primary fw-bold">Register as Author</a></p>
+                <p class="fs-12px text-soft mt-4">&copy; {{ date('Y') }} Griots Lounge Publishing (Nigeria & Canada).</p>
             </div>
         </div>
     </div>

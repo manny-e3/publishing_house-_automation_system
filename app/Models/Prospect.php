@@ -28,6 +28,9 @@ class Prospect extends Model
         'preferred_sales_channels' => 'array',
         'agreement_terms' => 'boolean',
         
+        'marketing_opt_in' => 'boolean',
+        'social_links' => 'array',
+        
         // Master Workflow Casts
         'determined_model' => PublishingModel::class,
         'manuscript_rating' => ManuscriptRating::class,

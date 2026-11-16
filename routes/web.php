@@ -23,6 +23,8 @@ use App\Http\Controllers\Dashboard\AuthorPortalController;
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::get('/admin/login', [AuthController::class, 'showAdminLogin'])->name('admin.login');
+Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('admin.login.post');
 Route::get('/verify-otp', [AuthController::class, 'showOTP'])->name('otp.show');
 Route::post('/verify-otp', [AuthController::class, 'verifyOTP'])->name('otp.verify');
 Route::post('/resend-otp', [AuthController::class, 'resendOTP'])->name('otp.resend');
@@ -51,6 +53,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/prospects', [AdminController::class, 'prospects'])->name('prospects.index');
     Route::get('/prospects/{prospect}', [AdminController::class, 'show'])->name('prospects.show');
+    Route::get('/prospects/{prospect}/download/manuscript', [AdminController::class, 'downloadManuscript'])->name('prospects.download_manuscript');
+    Route::get('/prospects/{prospect}/download/cover', [AdminController::class, 'downloadCover'])->name('prospects.download_cover');
     Route::patch('/prospects/{prospect}/status', [AdminController::class, 'updateStatus'])->name('prospects.status');
     Route::post('/prospects/{prospect}/estimate', [AdminController::class, 'updateEstimate'])->name('prospects.update_estimate');
 
@@ -119,6 +123,8 @@ Route::group(['prefix' => 'author', 'as' => 'author.', 'middleware' => ['auth']]
     Route::get('/enquiries', [AuthorDashboardController::class, 'enquiries'])->name('enquiries.index');
     Route::get('/enquiries/create', [AuthorDashboardController::class, 'createEnquiry'])->name('enquiries.create');
     Route::get('/enquiries/{prospect}', [AuthorDashboardController::class, 'showEnquiry'])->name('enquiries.show');
+    Route::get('/enquiries/{prospect}/download/manuscript', [AuthorDashboardController::class, 'downloadManuscript'])->name('enquiries.download_manuscript');
+    Route::get('/enquiries/{prospect}/download/cover', [AuthorDashboardController::class, 'downloadCover'])->name('enquiries.download_cover');
     
     Route::get('/invoices', [AuthorDashboardController::class, 'invoices'])->name('invoices');
     Route::get('/transactions', [AuthorDashboardController::class, 'transactions'])->name('transactions');
@@ -157,6 +163,8 @@ Route::middleware(['auth', \App\Http\Middleware\RoleDashboardGuard::class])->gro
     Route::prefix('dashboard/editorial')->name('dashboard.editorial.')->group(function () {
         Route::get('/', [EditorialDashboardController::class, 'index'])->name('index');
         Route::get('/{prospect}', [EditorialDashboardController::class, 'show'])->name('show');
+        Route::get('/{prospect}/download/manuscript', [EditorialDashboardController::class, 'downloadManuscript'])->name('download_manuscript');
+        Route::get('/{prospect}/download/cover', [EditorialDashboardController::class, 'downloadCover'])->name('download_cover');
         Route::post('/{prospect}/toggle-task', [EditorialDashboardController::class, 'toggleTask'])->name('task.toggle');
         Route::post('/{prospect}/rate', [EditorialDashboardController::class, 'updateRating'])->name('rate');
     });

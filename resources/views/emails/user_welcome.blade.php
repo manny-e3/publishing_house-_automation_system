@@ -18,19 +18,19 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="brand">The Archive</div>
+            <div class="brand">Griots Lounge Publishing</div>
         </div>
         <div class="content">
-            <h2 style="font-size: 24px; margin-bottom: 20px;">Staff Portal Activated</h2>
+            <h2 style="font-size: 24px; margin-bottom: 20px;">Staff Portal Access Activated</h2>
             <p>Hello {{ $user->name }},</p>
-            <p>An administrative account has been created for you at <strong>The Curated Archive Publishing House</strong>. You have been granted access to the internal dashboard to manage platform operations.</p>
+            <p>An administrative staff account has been provisioned for you at <strong>Griots Lounge Publishing</strong>. You have been granted access to the internal editorial and publishing console.</p>
             
-            <p>Please use the credentials below to log in to the staff portal:</p>
+            <p>Please use the direct credentials below to log in to the staff console:</p>
 
             <div class="credentials">
                 <div class="credential-item">
-                    <span class="label">Portal URL</span>
-                    <span class="value">{{ route('login') }}</span>
+                    <span class="label">Staff Console URL</span>
+                    <span class="value">{{ route('admin.login') }}</span>
                 </div>
                 <div class="credential-item">
                     <span class="label">Username (Email)</span>
@@ -43,13 +43,13 @@
             </div>
 
             <p style="text-align: center; margin-top: 40px;">
-                <a href="{{ route('login') }}" class="button">Log In to Staff Portal</a>
+                <a href="{{ route('admin.login') }}" class="button">Log In to Staff Console</a>
             </p>
 
-            <p style="margin-top: 40px; font-size: 14px; color: #6b7280;"><em>For security reasons, please change your password immediately upon your first login through the profile settings.</em></p>
+            <p style="margin-top: 40px; font-size: 14px; color: #6b7280;"><em>For security reasons, please change your password immediately upon your first login through your profile settings.</em></p>
         </div>
         <div class="footer">
-            <p>&copy; {{ date('Y') }} The Curated Archive Publishing House</p>
+            <p>&copy; {{ date('Y') }} Griots Lounge Publishing (Nigeria & Canada). All rights reserved.</p>
         </div>
     </div>
 </body>

@@ -174,7 +174,7 @@
                                                                         <span class="sub-text">Original Upload</span>
                                                                     </div>
                                                                 </div>
-                                                                <a href="{{ asset('storage/' . $project->prospect->manuscript_file_path) }}" target="_blank" class="btn btn-trigger btn-icon"><em class="icon ni ni-download-cloud"></em></a>
+                                                                <a href="{{ route('admin.prospects.download_manuscript', $project->prospect_id) }}" class="btn btn-trigger btn-icon"><em class="icon ni ni-download-cloud"></em></a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -194,7 +194,7 @@
                                                                         <span class="sub-text">Reference/Draft</span>
                                                                     </div>
                                                                 </div>
-                                                                <a href="{{ asset('storage/' . $project->prospect->cover_design_path) }}" target="_blank" class="btn btn-trigger btn-icon"><em class="icon ni ni-download-cloud"></em></a>
+                                                                <a href="{{ route('admin.prospects.download_cover', $project->prospect_id) }}" class="btn btn-trigger btn-icon"><em class="icon ni ni-download-cloud"></em></a>
                                                             </div>
                                                         </div>
                                                     </div>

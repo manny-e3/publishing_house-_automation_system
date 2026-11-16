@@ -36,7 +36,14 @@ class EnquiryController extends Controller
         $disclaimer = PricingEngineService::DISCLAIMER;
         $utmSource = $request->query('utm_source', $request->query('source', 'direct'));
 
-        return view('enquiry', compact('exchangeRate', 'trimSpecs', 'disclaimer', 'utmSource'));
+        // Geo-IP detection: Priority fallback to Nigeria (NGN)
+        $defaultCurrency = 'NGN';
+        $cfCountry = $request->header('CF-IPCountry');
+        if ($cfCountry && !in_array(strtoupper($cfCountry), ['NG', 'XX', 'T1'])) {
+            $defaultCurrency = 'USD';
+        }
+
+        return view('enquiry', compact('exchangeRate', 'trimSpecs', 'disclaimer', 'utmSource', 'defaultCurrency'));
     }
 
     public function calculateQuote(Request $request): JsonResponse
@@ -52,11 +59,11 @@ class EnquiryController extends Controller
         $pricing = $this->pricingService->calculate([
             'number_of_words' => (int) $request->input('number_of_words', 0),
             'genre' => $genre,
-            'currency' => $request->input('currency', 'USD'),
+            'currency' => $request->input('currency', 'NGN'),
             'include_proofreading' => $request->boolean('include_proofreading'),
             'include_cover_design' => $request->boolean('include_cover_design'),
             'include_marketing_package' => $request->boolean('include_marketing_package'),
-            'trim_size' => $request->input('trim_size', 'six_by_nine'),
+            'trim_size' => $request->input('trim_size', 'five_half_by_eight_half'),
             'binding_type' => $request->input('binding_type', 'paperback'),
             'print_quantity' => (int) $request->input('print_quantity', 500),
         ]);
@@ -73,6 +80,7 @@ class EnquiryController extends Controller
     {
         // Fallback / sensible defaults for smooth submission
         $request->merge([
+            'publishing_option' => $request->input('publishing_option') ?: 'hybrid',
             'agreement_name' => $request->input('agreement_name') ?: $request->input('name', 'Author Electronic Signature'),
             'stage_of_manuscript' => $request->input('stage_of_manuscript') ?: 'Completed',
             'has_social_presence' => $request->has('has_social_presence'),
@@ -81,34 +89,47 @@ class EnquiryController extends Controller
             'include_proofreading' => $request->has('include_proofreading'),
             'include_cover_design' => $request->has('include_cover_design'),
             'include_marketing_package' => $request->has('include_marketing_package'),
+            'marketing_opt_in' => $request->has('marketing_opt_in'),
             'agreement_terms' => $request->has('agreement_terms') ? '1' : ($request->input('agreement_terms') ?: '1'),
         ]);
 
         $validated = $request->validate([
+            // Publishing Pathway Option (Point 6)
+            'publishing_option' => 'required|string|in:hybrid,traditional,advise_me',
+
+            // Author Profile (Point 5)
             'name' => 'required|string|max:255',
+            'pen_name' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
-            'phone_number' => 'required|string|max:20',
+            'phone_number' => 'required|string|max:25',
+            'author_location' => 'required|string|max:255',
+            'author_bio' => 'required|string|min:15|max:4000',
+            'prior_publications' => 'nullable|string|max:2000',
+            'social_twitter' => 'nullable|string|max:255',
+            'social_instagram' => 'nullable|string|max:255',
+            'social_linkedin' => 'nullable|string|max:255',
+            'social_website' => 'nullable|string|max:255',
             
+            // Book Details (Point 5)
             'book_title' => 'required|string|max:255',
             'genre' => 'required|string|max:255',
+            'synopsis' => 'required|string|min:20|max:6000',
+            'target_audience' => 'nullable|string|max:255',
+            'comparable_titles' => 'nullable|string|max:255',
             'stage_of_manuscript' => 'nullable|string|max:255',
-            'number_of_words' => 'required|integer|min:1',
-            
-            // Triage Metrics
-            'author_age' => 'nullable|integer|min:10|max:120',
-            'has_social_presence' => 'boolean',
-            'is_established_author' => 'boolean',
-            'marketing_source' => 'nullable|string|max:100',
+            'number_of_words' => 'required|integer|min:500',
             
             // Production Preferences
             'currency' => 'nullable|string|in:USD,NGN',
-            'trim_size' => 'nullable|string|in:five_by_eight,six_by_nine,seven_by_ten',
+            'trim_size' => 'nullable|string|in:five_by_eight,five_half_by_eight_half,six_by_nine,quarto,seven_by_ten',
             'binding_type' => 'nullable|string|in:paperback,hardcover',
             'print_quantity' => 'nullable|integer',
             'include_proofreading' => 'boolean',
             'include_cover_design' => 'boolean',
             'include_marketing_package' => 'boolean',
+            'marketing_opt_in' => 'boolean',
 
+            // Excerpt & Verification (Point 11)
             'manuscript_file' => 'required|file|mimes:pdf,doc,docx|max:25600',
             'cover_design_file' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:25600',
             
@@ -118,6 +139,14 @@ class EnquiryController extends Controller
 
         $validated['manuscript_file'] = $request->file('manuscript_file');
         $validated['cover_design_file'] = $request->file('cover_design_file');
+
+        // Consolidate social links
+        $validated['social_links'] = array_filter([
+            'twitter' => $request->input('social_twitter'),
+            'instagram' => $request->input('social_instagram'),
+            'linkedin' => $request->input('social_linkedin'),
+            'website' => $request->input('social_website'),
+        ]);
 
         // Maintain services array for backward compatibility
         $services = [];
@@ -129,29 +158,10 @@ class EnquiryController extends Controller
 
         $prospect = $this->prospectService->submitEnquiry($validated, $request->ip());
 
-        // 1. Traditional Acquisition Candidate -> Dedicated Confirmation Screen
-        if ($prospect->isTraditional()) {
-            return redirect()->route('enquiry.confirmed', ['prospect' => $prospect->id])
-                ->with('success', 'Your manuscript has been pre-qualified for Traditional Acquisition review.');
-        }
-
-        // 2. Osisi Hybrid Model -> Auto-Generate Invoice & Proceed Directly to Checkout
-        $amount = (float) ($prospect->estimated_cost > 0 
-            ? $prospect->estimated_cost 
-            : ($prospect->total_calculated_fee + $prospect->total_bulk_print_estimate));
-
-        $invoice = Invoice::create([
-            'prospect_id' => $prospect->id,
-            'invoice_number' => 'INV-' . strtoupper(Str::random(8)),
-            'amount' => max(1.0, $amount),
-            'total_paid' => 0,
-            'allowed_gateways' => ['paystack', 'stripe', 'bank_transfer'],
-            'min_deposit_percentage' => 50,
-            'status' => 'unpaid',
-        ]);
-
-        return redirect()->route('payments.checkout', ['invoice' => $invoice->id])
-            ->with('success', 'Manuscript ingested! Review your itemized invoice estimate and initialize your publishing deposit.');
+        // Redirect directly to the enhanced Confirmation & Next Steps Screen (Point 12)
+        // No automatic invoice checkout prior to editorial review!
+        return redirect()->route('enquiry.confirmed', ['prospect' => $prospect->id])
+            ->with('success', 'Thank you! Your manuscript enquiry and excerpt have been received for editorial appraisal.');
     }
 
     public function confirmed(Prospect $prospect)
