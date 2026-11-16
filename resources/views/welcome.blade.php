@@ -269,57 +269,6 @@
         </div>
     </header>
 
-                            <!-- Book Metadata & Synopsis -->
-                            <div class="sm:col-span-7 space-y-3">
-                                <div>
-                                    <span :class="books[active].badgeColor" 
-                                          class="inline-block px-2.5 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-full border mb-2"
-                                          x-text="books[active].badge"></span>
-                                    <h3 class="font-serif font-bold text-2xl text-[#00382B] leading-tight" x-text="books[active].title"></h3>
-                                    <p class="text-xs font-semibold text-brand-teal uppercase tracking-wider mt-1" x-text="books[active].genre"></p>
-                                </div>
-
-                                <p class="text-xs text-stone-600 leading-relaxed font-light" x-text="books[active].synopsis"></p>
-
-                                <div class="pt-2">
-                                    <a href="{{ route('enquiry.index') }}" class="inline-flex items-center space-x-1.5 text-xs font-bold text-[#00382B] hover:text-brand-teal uppercase tracking-wider transition">
-                                        <span>Publish With Us</span>
-                                        <span>&rarr;</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Thumbnail Shelf of Books -->
-                        <div class="mt-6 pt-5 border-t border-[#E2ECE7]">
-                            <div class="flex items-center justify-between text-[11px] text-stone-500 mb-3">
-                                <span class="font-medium">Explore Titles in this Cycle:</span>
-                                <span class="font-mono text-[10px]" x-text="`${active + 1} of ${books.length}`"></span>
-                            </div>
-                            <div class="grid grid-cols-5 gap-2 sm:gap-3">
-                                <template x-for="(b, i) in books" :key="i">
-                                    <button type="button" @click="active = i" 
-                                            class="relative rounded-md overflow-hidden transition-all duration-200 group focus:outline-none"
-                                            :class="active === i ? 'ring-2 ring-[#00382B] ring-offset-2 scale-105 shadow-md' : 'opacity-60 hover:opacity-100 hover:scale-102'">
-                                        <img :src="b.image" :alt="b.title" class="w-full h-16 sm:h-20 object-cover rounded-sm">
-                                    </button>
-                                </template>
-                            </div>
-                        </div>
-
-                        <!-- Ethos Footer -->
-                        <div class="mt-5 pt-3 border-t border-[#E2ECE7]/60 flex items-center justify-between text-[11px] text-stone-500">
-                            <span class="italic font-serif">"Amplifying African &amp; diverse minority voices"</span>
-                            <span class="text-stone-400 text-[10px]">Nigeria &bull; Canada &bull; Global</span>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </header>
-
     <!-- Three Publishing Pathways Section (Point 6) -->
     <section id="publishing-options" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
